@@ -99,10 +99,11 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
         const name = profileRes.data.full_name || profileRes.data.email.split('@')[0] || 'Algú'
         const { title, day_of_week, weekend_date } = activityRes.data
         const dayText = getFormattedDayText(weekend_date, day_of_week)
+        const isUpcoming = isUpcomingWeekend(weekend_date)
 
         sendPushNotification({
           headings: 'Això s\'anima!🚀',
-          contents: `${name} s'ha apuntat al pla "${title}" pel ${dayText}.`,
+          contents: `${name} s'ha apuntat al pla "${title}" ${isUpcoming ? 'per' : 'pel'} ${dayText}.`,
           date: weekend_date,
           excludedUserId: user.id
         })

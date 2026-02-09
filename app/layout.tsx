@@ -35,6 +35,7 @@ export const viewport: Viewport = {
 };
 
 import OneSignalProvider from "@/components/OneSignalProvider";
+import RefreshOnFocus from "@/components/RefreshOnFocus";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
@@ -58,6 +59,7 @@ export default async function RootLayout({
         />
         <ThemeProvider>
           <OneSignalProvider userId={user?.id} />
+          <RefreshOnFocus />
           {children}
         </ThemeProvider>
       </body>

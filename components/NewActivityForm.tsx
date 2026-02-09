@@ -35,6 +35,11 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
       action={async (formData) => {
         setIsPending(true)
         setError(null)
+        
+        const hour = formData.get('hour')
+        const minute = formData.get('minute')
+        formData.set('start_time', `${hour}:${minute}`)
+
         const res = await createActivity(formData)
         setIsPending(false)
         if (res.success) {
@@ -94,18 +99,39 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
           className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold"
         />
 
-        {/* Camp d'hora millorat amb icona i label */}
+        {/* Selector d'hora personalitzat de 15 minuts */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">
             <Clock size={12} />
             A quina hora?
           </label>
-          <input
-            name="start_time"
-            type="time"
-            required
-            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold text-zinc-950 dark:text-white appearance-none"
-          />
+          <div className="flex gap-2">
+            <select
+              name="hour"
+              defaultValue="19"
+              className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold text-zinc-950 dark:text-white appearance-none text-center"
+            >
+              {Array.from({ length: 24 }).map((_, i) => (
+                <option key={i} value={i.toString().padStart(2, '0')}>
+                  {i.toString().padStart(2, '0')}h
+                </option>
+              ))}
+            </select>
+            <div className="flex items-center font-bold text-zinc-400">:</div>
+            <select
+              name="minute"
+              defaultValue="00"
+              className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold text-zinc-950 dark:text-white appearance-none text-center"
+            >
+              {['00', '15', '30', '45'].map((m) => (
+                <option key={m} value={m}>
+                  {m}m
+                </option>
+              ))}
+            </select>
+          </div>
+          {/* Combinem els valors en un input hidden per l'acció */}
+          <input type="hidden" name="start_time" value="" />
         </div>
 
         <textarea
