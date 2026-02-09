@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { sendPushNotification } from '@/lib/onesignal'
 
 export async function createActivity(formData: FormData) {
   const supabase = await createClient()
@@ -24,6 +25,14 @@ export async function createActivity(formData: FormData) {
     })
 
   if (error) throw error
+
+  // Notifiquem a tothom del nou pla
+  sendPushNotification({
+    headings: 'Nou pla proposat! 📝',
+    contents: `${title}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
+    excludedUserId: user.id
+  })
+
   revalidatePath('/')
 }
 
@@ -36,7 +45,7 @@ export async function deleteActivity(activityId: string) {
     .from('activities')
     .delete()
     .eq('id', activityId)
-    .eq('creator_id', user.id) // Double security check
+    .eq('creator_id', user.id)
 
   if (error) throw error
   revalidatePath('/')

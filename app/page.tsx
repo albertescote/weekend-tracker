@@ -42,8 +42,8 @@ export default async function Home({
       <PullToRefresh />
 
       {/* 1. TOP BAR (Sticky) */}
-      <div className="w-full bg-background sticky top-0 z-40 px-6 pt-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
-        <header className="flex items-start justify-between w-full max-w-md mx-auto">
+      <div className="w-full bg-background sticky top-0 z-40 px-6 pt-8 pb-6 border-b border-zinc-100 dark:border-zinc-800 text-zinc-950 dark:text-white">
+        <header className="flex items-start justify-between w-full max-w-md mx-auto text-zinc-950 dark:text-white">
           <div className="flex flex-col">
             <h1 className="text-3xl font-black tracking-tighter leading-[0.85] text-zinc-950 dark:text-white flex flex-col">
               <span>WEEKEND</span>
@@ -51,24 +51,18 @@ export default async function Home({
             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">{displayDate}</p>
           </div>
 
-          <div className="flex items-center gap-2 mt-1">
+          <div className="flex items-center gap-2 mt-1 text-zinc-950 dark:text-white">
             <ThemeToggle />
             {user && <ProfileButton user={user} profile={profile} />}
           </div>
         </header>
       </div>
 
-      {/* Spacing increased below the line (mt-10) and header padding restored (pb-6) */}
       <div className="w-full max-w-md px-4 flex flex-col gap-6 pb-12 mt-10">
-
-        {/* 2. DATE SELECTOR */}
-        <section>
-          <WeekendSelector />
-        </section>
 
         {!user ? (
           <div className="flex flex-col items-center gap-4 text-center py-24">
-            <p className="text-lg font-medium opacity-60">Connecta amb la colla.</p>
+            <p className="text-lg font-medium opacity-60">Connecta amb els amics.</p>
             <a
               href="/login"
               className="px-10 py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl"
@@ -78,6 +72,11 @@ export default async function Home({
           </div>
         ) : (
           <>
+            {/* 2. DATE SELECTOR - Només es mostra si hi ha usuari */}
+            <section>
+              <WeekendSelector />
+            </section>
+
             {/* 3. CONTEXTUAL WEATHER & VOTE */}
             <div className="flex flex-col gap-6">
               <Suspense fallback={<div className="h-24 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-[2rem]" />}>

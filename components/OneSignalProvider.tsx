@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Bell } from 'lucide-react'
+import { Bell, AlertCircle } from 'lucide-react'
 
 export default function OneSignalProvider({ userId }: { userId: string | undefined }) {
   const [isSubscribed, setIsSubscribed] = useState(true)
   const [initialized, setInitialized] = useState(false)
+  const [permissionDenied, setPermissionDenied] = useState(false)
   const initRef = useRef(false)
 
   useEffect(() => {
@@ -20,9 +21,13 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
     const syncSubscription = async (OneSignal: any) => {
       const id = OneSignal.User.PushSubscription.id
       const optedIn = OneSignal.User.PushSubscription.optedIn
-      setIsSubscribed(optedIn)
+      
+      // Comprovar si el permís ha estat denegat manualment
+      const isDenied = Notification.permission === 'denied'
+      setPermissionDenied(isDenied)
+      setIsSubscribed(optedIn && !isDenied)
 
-      if (id && optedIn) {
+      if (id && optedIn && !isDenied) {
         const supabase = createClient()
         await supabase
           .from('profiles')
@@ -34,7 +39,6 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
     const runInit = async () => {
       const OneSignal = (window as any).OneSignal
       if (!OneSignal) {
-        // If not loaded yet, wait and try again
         setTimeout(runInit, 500)
         return
       }
@@ -60,22 +64,40 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
   }, [userId])
 
   const handleSubscribe = async () => {
+    if (permissionDenied) {
+      alert('Has bloquejat les notificacions. Per activar-les, has d\'anar a la configuració del teu navegador o dispositiu i permetre-les per aquesta web.')
+      return
+    }
+
     const OneSignal = (window as any).OneSignal
     if (OneSignal) {
       await OneSignal.Slidedown.promptPush()
     }
   }
 
-  if (!userId || isSubscribed || !initialized) return null
+  if (!userId || (isSubscribed && !permissionDenied) || !initialized) return null
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-[100]">
       <button
         onClick={handleSubscribe}
-        className="flex items-center gap-2 bg-zinc-900 text-white px-5 py-3 rounded-full shadow-xl hover:bg-zinc-800 active:scale-95 transition-all font-bold text-sm"
+        className={`flex items-center gap-2 px-5 py-3 rounded-full shadow-xl active:scale-95 transition-all font-bold text-sm ${
+          permissionDenied 
+            ? 'bg-red-500 text-white hover:bg-red-600' 
+            : 'bg-zinc-900 text-white hover:bg-zinc-800'
+        }`}
       >
-        <Bell size={18} />
-        Activa Notificacions
+        {permissionDenied ? (
+          <>
+            <AlertCircle size={18} />
+            Notificacions bloquejades
+          </>
+        ) : (
+          <>
+            <Bell size={18} />
+            Activa Notificacions
+          </>
+        )}
       </button>
     </div>
   )
