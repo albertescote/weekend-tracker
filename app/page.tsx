@@ -46,11 +46,10 @@ export default async function Home({
         <header className="flex items-start justify-between w-full max-w-md mx-auto">
           <div className="flex flex-col">
             <h1 className="text-3xl font-black tracking-tighter leading-[0.85] text-zinc-950 dark:text-white flex flex-col">
-              <span>WEEKEND</span>
+              <span>Cap de</span>
+              <span>setmana</span>
             </h1>
-            <div className="flex items-center gap-2 mt-3">
-              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em]">{displayDate}</p>
-            </div>
+            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">{displayDate}</p>
           </div>
 
           <div className="flex items-center gap-2 mt-1">
@@ -60,12 +59,14 @@ export default async function Home({
         </header>
       </div>
 
-            <div className="w-full max-w-md px-4 flex flex-col gap-6 pb-12">
+      {/* Spacing increased below the line (mt-10) and header padding restored (pb-6) */}
+      <div className="w-full max-w-md px-4 flex flex-col gap-6 pb-12 mt-10">
 
-              {/* 2. DATE SELECTOR */}
-              <section>
-                <WeekendSelector />
-              </section>
+        {/* 2. DATE SELECTOR */}
+        <section>
+          <WeekendSelector />
+        </section>
+
         {!user ? (
           <div className="flex flex-col items-center gap-4 text-center py-24">
             <p className="text-lg font-medium opacity-60">Connecta amb la colla.</p>
