@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Bell, Settings } from 'lucide-react'
+import { Bell, AlertCircle, Settings } from 'lucide-react'
 
 export default function OneSignalProvider({ userId }: { userId: string | undefined }) {
   const [isSubscribed, setIsSubscribed] = useState(true)
@@ -30,7 +30,10 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
 
         if (id && optedIn && perm === 'granted') {
           const supabase = createClient()
-          await supabase.from('profiles').update({ onesignal_id: id }).eq('id', userId)
+          await supabase
+            .from('profiles')
+            .update({ onesignal_id: id })
+            .eq('id', userId)
         }
       } catch (e) {
         console.error("OneSignal sync error", e)
@@ -50,8 +53,10 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
             appId: appId,
             allowLocalhostAsSecureOrigin: true,
           })
+          
           setInitialized(true)
           await syncSubscription(OneSignal)
+
           OneSignal.User.PushSubscription.addEventListener("change", () => syncSubscription(OneSignal))
         } catch (e) {
           console.error('OneSignal init error:', e)
@@ -64,29 +69,19 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
 
   const handleSubscribe = async () => {
     const OneSignal = (window as any).OneSignal
-    
-    // 1. Si ja ens han denegat el permís manualment
-    if (window.Notification?.permission === 'denied') {
+    if (!OneSignal) return
+
+    if (permissionStatus === 'denied') {
       setShowInstructions(true)
       setTimeout(() => setShowInstructions(false), 8000)
       return
     }
 
     try {
-      // 2. Intentem primer la via NATIVA (especialment per a iOS PWA)
-      if (typeof Notification !== 'undefined' && Notification.requestPermission) {
-        const result = await Notification.requestPermission()
-        if (result === 'granted' && OneSignal) {
-          // Si ens donen permís, avisem a OneSignal perquè es registri
-          await OneSignal.User.PushSubscription.optIn()
-        }
-      } else if (OneSignal) {
-        // 3. Fallback a OneSignal
-        await OneSignal.Notifications.requestPermission()
-      }
-    } catch (err) {
-      console.error("Prompt error", err)
-      if (OneSignal) await OneSignal.Slidedown.promptPush()
+      await OneSignal.Notifications.requestPermission()
+    } catch (e) {
+      console.error("Native prompt error, trying slidedown...", e)
+      await OneSignal.Slidedown.promptPush()
     }
   }
 
@@ -99,7 +94,7 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
       {showInstructions && (
         <div className="bg-white dark:bg-zinc-900 border-2 border-red-500 p-4 rounded-3xl shadow-2xl animate-in slide-in-from-bottom-2 duration-300">
           <p className="text-[11px] font-black text-red-600 dark:text-red-400 uppercase tracking-tight leading-relaxed text-center">
-            ⚠️ ACCÉS BLOQUEJAT: Ves a la configuració de l'iPhone, busca aquesta App i activa les notificacions.
+            ⚠️ ACCÉS BLOQUEJAT: Ves a la configuració del mòbil i activa les notificacions per aquesta App.
           </p>
         </div>
       )}
@@ -109,13 +104,13 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
         className={`flex items-center gap-2 px-6 py-4 rounded-full shadow-2xl active:scale-95 transition-all font-black text-sm ${
           permissionStatus === 'denied'
             ? 'bg-red-500 text-white' 
-            : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900'
+            : 'bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900 hover:scale-105'
         }`}
       >
         {permissionStatus === 'denied' ? (
           <>
             <Settings size={20} />
-            Corregir permisos
+            Configura Notificacions
           </>
         ) : (
           <>
