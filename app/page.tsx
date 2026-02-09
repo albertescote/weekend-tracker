@@ -128,7 +128,7 @@ export default async function Home({
       </div>
 
       <footer className="mt-auto py-12 text-zinc-400 text-[10px] font-bold uppercase tracking-widest text-center">
-        Weekend Tracker v2.0
+        Weekend Tracker v1.0
       </footer>
     </main>
   )
