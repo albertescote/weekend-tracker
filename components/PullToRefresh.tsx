@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react'
 
@@ -8,45 +8,62 @@ export default function PullToRefresh() {
   const router = useRouter()
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [pullDistance, setPullDistance] = useState(0)
-  const [startY, setStartY] = useState(0)
+  const startY = useRef(0)
+  const isPulling = useRef(false)
 
   useEffect(() => {
     const handleTouchStart = (e: TouchEvent) => {
-      if (window.scrollY === 0) {
-        setStartY(e.touches[0].pageY)
+      // Only start pulling if we are at the absolute top
+      if (window.scrollY <= 0) {
+        startY.current = e.touches[0].pageY
+        isPulling.current = true
       }
     }
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (window.scrollY === 0 && !isRefreshing) {
-        const currentY = e.touches[0].pageY
-        const distance = currentY - startY
-        if (distance > 0) {
-          setPullDistance(Math.min(distance * 0.4, 80))
-          if (distance > 50) {
-            // Prevent bounce on iOS
-            if (e.cancelable) e.preventDefault()
-          }
-        }
+      if (!isPulling.current || isRefreshing) return
+
+      const currentY = e.touches[0].pageY
+      const diff = currentY - startY.current
+
+      if (diff > 0 && window.scrollY <= 0) {
+        // Apply resistance (logarithmic-like feel)
+        const distance = Math.pow(diff, 0.85)
+        setPullDistance(Math.min(distance, 100))
+        
+        // Prevent browser's native bounce/refresh
+        if (e.cancelable) e.preventDefault()
+      } else {
+        isPulling.current = false
+        setPullDistance(0)
       }
     }
 
-    const handleTouchEnd = async () => {
-      if (pullDistance > 60) {
-        setIsRefreshing(true)
-        setPullDistance(40)
-        router.refresh()
-        // Artificial delay for better UX
-        setTimeout(() => {
-          setIsRefreshing(false)
-          setPullDistance(0)
-        }, 1000)
+    const handleTouchEnd = () => {
+      if (!isPulling.current) return
+      isPulling.current = false
+
+      if (pullDistance > 70) {
+        triggerRefresh()
       } else {
         setPullDistance(0)
       }
     }
 
-    window.addEventListener('touchstart', handleTouchStart)
+    const triggerRefresh = () => {
+      setIsRefreshing(true)
+      setPullDistance(60) // Stay at "loading" position
+      
+      router.refresh()
+      
+      // Keep visible for at least 1s for better feedback
+      setTimeout(() => {
+        setIsRefreshing(false)
+        setPullDistance(0)
+      }, 1000)
+    }
+
+    window.addEventListener('touchstart', handleTouchStart, { passive: true })
     window.addEventListener('touchmove', handleTouchMove, { passive: false })
     window.addEventListener('touchend', handleTouchEnd)
 
@@ -55,17 +72,27 @@ export default function PullToRefresh() {
       window.removeEventListener('touchmove', handleTouchMove)
       window.removeEventListener('touchend', handleTouchEnd)
     }
-  }, [startY, pullDistance, isRefreshing, router])
+  }, [pullDistance, isRefreshing, router])
 
   if (pullDistance <= 0 && !isRefreshing) return null
 
   return (
     <div 
-      className="fixed top-0 left-0 w-full flex justify-center z-[100] pointer-events-none"
-      style={{ transform: `translateY(${pullDistance}px)` }}
+      className="fixed top-0 left-0 w-full flex justify-center z-[9999] pointer-events-none"
+      style={{ 
+        transform: `translateY(${pullDistance - 50}px)`,
+        opacity: Math.min(pullDistance / 60, 1),
+        transition: isPulling.current ? 'none' : 'transform 0.3s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s'
+      }}
     >
-      <div className="bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 p-2 rounded-full shadow-xl">
-        <Loader2 size={20} className={isRefreshing ? 'animate-spin' : ''} style={{ transform: `rotate(${pullDistance * 5}deg)` }} />
+      <div className="bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 p-2.5 rounded-full shadow-2xl border border-white/10 dark:border-black/10">
+        <Loader2 
+          size={22} 
+          className={isRefreshing ? 'animate-spin' : ''} 
+          style={{ 
+            transform: isRefreshing ? undefined : `rotate(${pullDistance * 4}deg)` 
+          }} 
+        />
       </div>
     </div>
   )

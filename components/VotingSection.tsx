@@ -32,15 +32,15 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
   }
 
   return (
-    <div className="flex flex-col items-center gap-4 p-8 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800">
-      <div className="text-center space-y-1">
-        <h2 className="text-xl font-bold tracking-tight text-zinc-950 dark:text-white">Hi seràs?</h2>
-        <p className="text-[10px] font-black uppercase tracking-widest text-blue-500 dark:text-blue-400">
+    <div className="flex flex-col items-center gap-2 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800">
+      <div className="text-center space-y-0.5">
+        <h2 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">Hi seràs?</h2>
+        <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 dark:text-blue-400">
           Cap de setmana del {displayDate}
         </p>
       </div>
       
-      <div className="flex gap-4 mt-2">
+      <div className="flex gap-4 mt-1">
         <button
           onClick={() => handleVote('going')}
           disabled={isPending}
