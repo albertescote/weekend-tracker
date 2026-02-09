@@ -8,6 +8,8 @@ import { parseISO, addDays, format } from 'date-fns'
 export default function NewActivityForm({ weekendDate }: { weekendDate: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedDay, setSelectedDay] = useState('dissabte')
+  const [error, setError] = useState<string | null>(null)
+  const [isPending, setIsPending] = useState(false)
 
   const anchorDate = parseISO(weekendDate)
   const daysData = [
@@ -31,20 +33,36 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
   return (
     <form
       action={async (formData) => {
-        await createActivity(formData)
-        setIsOpen(false)
+        setIsPending(true)
+        setError(null)
+        const res = await createActivity(formData)
+        setIsPending(false)
+        if (res.success) {
+          setIsOpen(false)
+        } else {
+          setError(res.error || 'Alguna cosa ha anat malament')
+        }
       }}
       className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-6 rounded-[2rem] shadow-xl space-y-4 relative animate-in zoom-in-95 duration-200"
     >
       <button
         type="button"
-        onClick={() => setIsOpen(false)}
+        onClick={() => {
+          setIsOpen(false)
+          setError(null)
+        }}
         className="absolute top-4 right-4 text-zinc-400 hover:text-zinc-600"
       >
         <X size={20} />
       </button>
 
       <h3 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">Nou Pla</h3>
+
+      {error && (
+        <p className="text-xs font-bold text-red-500 bg-red-50 dark:bg-red-900/20 p-3 rounded-xl">
+          {error}
+        </p>
+      )}
 
       <input type="hidden" name="weekend_date" value={weekendDate} />
       <input type="hidden" name="day_of_week" value={selectedDay} />
@@ -100,9 +118,10 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
 
       <button
         type="submit"
-        className="w-full py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-black transition-transform active:scale-95 shadow-lg"
+        disabled={isPending}
+        className="w-full py-3 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-xl font-black transition-transform active:scale-95 shadow-lg disabled:opacity-50"
       >
-        AFEGIR PLA
+        {isPending ? 'CREANT...' : 'AFEGIR PLA'}
       </button>
     </form>
   )

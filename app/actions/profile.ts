@@ -2,24 +2,46 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { z } from 'zod'
+import { ActionResponse } from '@/types'
 
-export async function updateProfile(formData: FormData) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) throw new Error('Unauthorized')
+const UpdateProfileSchema = z.object({
+  full_name: z.string().min(1, 'El nom és obligatori'),
+  avatar_url: z.string().url().optional().or(z.literal('')),
+})
 
-  const fullName = formData.get('full_name') as string
-  const avatarUrl = formData.get('avatar_url') as string
+export async function updateProfile(formData: FormData): Promise<ActionResponse> {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Sessió no iniciada' }
 
-  const { error } = await supabase
-    .from('profiles')
-    .update({
-      full_name: fullName,
-      avatar_url: avatarUrl,
-      updated_at: new Date().toISOString(),
-    })
-    .eq('id', user.id)
+    const rawData = {
+      full_name: formData.get('full_name'),
+      avatar_url: formData.get('avatar_url'),
+    }
 
-  if (error) throw error
-  revalidatePath('/')
+    const validatedData = UpdateProfileSchema.safeParse(rawData)
+    if (!validatedData.success) {
+      return { success: false, error: validatedData.error.issues[0].message }
+    }
+
+    const { full_name, avatar_url } = validatedData.data
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name,
+        avatar_url: avatar_url || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id)
+
+    if (error) throw error
+    revalidatePath('/')
+    return { success: true }
+  } catch (e) {
+    console.error('Error updating profile:', e)
+    return { success: false, error: 'No s\'ha pogut actualitzar el perfil' }
+  }
 }

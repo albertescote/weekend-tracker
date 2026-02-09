@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "WEEKEND",
-  description: "Organitza el cap de setmana amb la colla",
+  description: "Organitza el cap de setmana amb els teus amics",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,

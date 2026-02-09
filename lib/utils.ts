@@ -1,4 +1,4 @@
-import { nextFriday, isFriday, startOfDay, addWeeks, format, addDays } from 'date-fns';
+import { nextFriday, isFriday, startOfDay, addWeeks, format, addDays, parseISO, isSameDay } from 'date-fns';
 import { ca } from 'date-fns/locale';
 
 export const HOMETOWN_COORDINATES = { lat: 41.2856, lng: 1.2504 };
@@ -7,6 +7,23 @@ export function getUpcomingFriday() {
   const now = new Date();
   if (isFriday(now)) return startOfDay(now);
   return nextFriday(now);
+}
+
+export function getFormattedDayText(weekendDate: string, dayOfWeek: string) {
+  const upcomingFriday = getUpcomingFriday();
+  const anchorDate = parseISO(weekendDate);
+  const isUpcoming = isSameDay(anchorDate, upcomingFriday);
+
+  // Calculem la data real de l'esdeveniment basat en el dia triat
+  let eventDate = anchorDate;
+  if (dayOfWeek === 'dissabte') eventDate = addDays(anchorDate, 1);
+  if (dayOfWeek === 'diumenge') eventDate = addDays(anchorDate, 2);
+
+  if (isUpcoming) {
+    return `aquest ${dayOfWeek}`;
+  } else {
+    return `${dayOfWeek} ${format(eventDate, "d 'de' MMMM", { locale: ca })}`;
+  }
 }
 
 export function getNextWeekends(count = 10) {

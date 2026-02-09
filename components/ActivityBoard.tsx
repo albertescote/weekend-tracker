@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import ActivityCard from './ActivityCard'
 import NewActivityForm from './NewActivityForm'
+import { Activity } from '@/types'
 
 export default async function ActivityBoard({ weekendDate, currentUserId }: { weekendDate: string, currentUserId: string }) {
   const supabase = await createClient()
@@ -23,7 +24,7 @@ export default async function ActivityBoard({ weekendDate, currentUserId }: { we
 
   // Ordenació manual per dies de la setmana i hora
   const dayOrder: { [key: string]: number } = { 'divendres': 1, 'dissabte': 2, 'diumenge': 3 };
-  const sortedActivities = activities?.sort((a, b) => {
+  const sortedActivities = (activities as unknown as Activity[])?.sort((a, b) => {
     if (dayOrder[a.day_of_week] !== dayOrder[b.day_of_week]) {
       return dayOrder[a.day_of_week] - dayOrder[b.day_of_week];
     }
@@ -36,7 +37,7 @@ export default async function ActivityBoard({ weekendDate, currentUserId }: { we
         {sortedActivities?.map((activity) => (
           <ActivityCard 
             key={activity.id} 
-            activity={activity as any} 
+            activity={activity} 
             currentUserId={currentUserId} 
           />
         ))}

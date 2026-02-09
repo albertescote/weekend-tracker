@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import ProfileModal from './ProfileModal'
+import { Profile } from '@/types'
+import { User } from '@supabase/supabase-js'
 
-export default function ProfileButton({ user, profile }: { user: any, profile: any }) {
+export default function ProfileButton({ user, profile }: { user: User, profile: Profile | null }) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (

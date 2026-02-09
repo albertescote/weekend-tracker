@@ -3,36 +3,19 @@
 import { useOptimistic, useTransition } from 'react'
 import { toggleActivityParticipation, deleteActivity } from '@/app/actions/activities'
 import { Users, Clock, Trash2 } from 'lucide-react'
-
-interface Participant {
-  user_id: string
-  profiles: {
-    full_name: string | null
-    avatar_url: string | null
-    email: string
-  }
-}
-
-interface Activity {
-  id: string
-  creator_id: string
-  title: string
-  description: string | null
-  start_time: string | null
-  day_of_week: string
-  activity_participants: Participant[]
-}
+import { Activity } from '@/types'
 
 export default function ActivityCard({ activity, currentUserId }: { activity: Activity, currentUserId: string }) {
   const [isPending, startTransition] = useTransition()
-  const isJoined = activity.activity_participants.some(p => p.user_id === currentUserId)
+  const participants = activity.activity_participants || []
+  const isJoined = participants.some(p => p.user_id === currentUserId)
   const isCreator = activity.creator_id === currentUserId
 
   const [optimisticParticipants, setOptimisticParticipants] = useOptimistic(
-    activity.activity_participants,
+    participants,
     (state, isJoining: boolean) => {
       if (isJoining) {
-        return [...state, { user_id: currentUserId, profiles: { full_name: 'Tu', avatar_url: null, email: '' } }]
+        return [...state, { user_id: currentUserId, activity_id: activity.id, profiles: { full_name: 'Tu', avatar_url: null, email: '', id: currentUserId, updated_at: new Date().toISOString() } }]
       }
       return state.filter(p => p.user_id !== currentUserId)
     }
@@ -69,7 +52,7 @@ export default function ActivityCard({ activity, currentUserId }: { activity: Ac
             </span>
             <h4 className="font-bold text-lg leading-tight text-zinc-950 dark:text-white truncate">{activity.title}</h4>
             {isCreator && (
-              <button 
+              <button
                 onClick={handleDelete}
                 className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-red-500 transition-all rounded-lg active:scale-90"
                 aria-label="Esborra el pla"
@@ -96,16 +79,16 @@ export default function ActivityCard({ activity, currentUserId }: { activity: Ac
       <div className="flex items-center justify-between pt-2 border-t border-zinc-50 dark:border-zinc-800">
         <div className="flex -space-x-2">
           {optimisticParticipants.map((p, i) => (
-            <div 
-              key={i} 
+            <div
+              key={i}
               className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 border-2 border-white dark:border-zinc-900 flex items-center justify-center overflow-hidden"
-              title={p.profiles.full_name || p.profiles.email}
+              title={p.profiles?.full_name || p.profiles?.email}
             >
-              {p.profiles.avatar_url ? (
+              {p.profiles?.avatar_url ? (
                 <img src={p.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
               ) : (
                 <span className="text-[10px] font-bold uppercase">
-                  {p.profiles.full_name?.[0] || p.profiles.email?.[0] || '?'}
+                  {p.profiles?.full_name?.[0] || p.profiles?.email?.[0] || '?'}
                 </span>
               )}
             </div>

@@ -3,12 +3,15 @@
 import { useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { updateProfile } from '@/app/actions/profile'
-import { X, Camera, Loader2, User } from 'lucide-react'
+import { signOut } from '@/app/actions/auth'
+import { X, Camera, Loader2, User, LogOut } from 'lucide-react'
 import Portal from './Portal'
+import { Profile } from '@/types'
+import { User as SupabaseUser } from '@supabase/supabase-js'
 
 interface Props {
-  user: any
-  profile: any
+  user: SupabaseUser
+  profile: Profile | null
   onClose: () => void
 }
 
@@ -129,14 +132,29 @@ export default function ProfileModal({ user, profile, onClose }: Props) {
                 </div>
               </div>
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {loading && <Loader2 size={20} className="animate-spin" />}
-                GUARDAR CANVIS
-              </button>
+              <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-4">
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (confirm('Segur que vols tancar la sessió?')) {
+                      await signOut()
+                    }
+                  }}
+                  className="w-full py-4 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-2xl font-bold active:scale-95 transition-all flex items-center justify-center gap-2"
+                >
+                  <LogOut size={20} />
+                  TANCAR SESSIÓ
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading && <Loader2 size={20} className="animate-spin" />}
+                  GUARDAR CANVIS
+                </button>
+              </div>
             </form>
           </div>
         </div>
