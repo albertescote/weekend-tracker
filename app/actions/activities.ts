@@ -64,7 +64,7 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
       const { title, day_of_week, weekend_date } = activityRes.data
 
       sendPushNotification({
-        headings: 'S\'apunten a un pla! 🙌',
+        headings: 'Això s\'anima!🚀🍻',
         contents: `${name} s'ha apuntat al pla "${title}" pel ${day_of_week}.`,
         date: weekend_date,
         excludedUserId: user.id

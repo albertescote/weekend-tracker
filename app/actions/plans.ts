@@ -31,7 +31,7 @@ export async function updateStatus(
   const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
   const upcomingFriday = getUpcomingFriday()
   const isUpcoming = isSameDay(parseISO(weekendDate), upcomingFriday)
-  
+
   let dateText = ''
   if (isUpcoming) {
     dateText = 'aquest cap de setmana'
@@ -48,7 +48,7 @@ export async function updateStatus(
   else statusAction = `no sap si anirà a Valls`
 
   sendPushNotification({
-    headings: 'Actualització de plans',
+    headings: 'Actualització de plans' + (status === 'going' ? ' ✅' : status === 'not_going' ? ' ❌' : ' ❓'),
     contents: `${name} ha dit que ${statusAction} ${dateText}!`,
     date: weekendDate,
     excludedUserId: userId
