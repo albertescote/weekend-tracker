@@ -45,10 +45,10 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
       </button>
 
       <h3 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">Nou Pla</h3>
-      
+
       <input type="hidden" name="weekend_date" value={weekendDate} />
       <input type="hidden" name="day_of_week" value={selectedDay} />
-      
+
       <div className="space-y-4">
         {/* Selector de Dia */}
         <div className="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl">
@@ -71,11 +71,11 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
 
         <input
           name="title"
-          placeholder="Títol (ex: Sopar a la plaça)"
+          placeholder="Títol"
           required
           className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold"
         />
-        
+
         {/* Camp d'hora millorat amb icona i label */}
         <div className="space-y-1.5">
           <label className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">
