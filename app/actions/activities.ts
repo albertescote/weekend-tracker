@@ -48,8 +48,33 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  if (isJoining) await supabase.from('activity_participants').insert({ activity_id: activityId, user_id: user.id })
-  else await supabase.from('activity_participants').delete().eq('activity_id', activityId).eq('user_id', user.id)
+  if (isJoining) {
+    // 1. Unir-se al pla
+    const { error } = await supabase.from('activity_participants').insert({ activity_id: activityId, user_id: user.id })
+    if (error) throw error
+
+    // 2. Notificació: Recuperem dades de l'activitat i de l'usuari
+    const [activityRes, profileRes] = await Promise.all([
+      supabase.from('activities').select('title, day_of_week, weekend_date').eq('id', activityId).single(),
+      supabase.from('profiles').select('full_name, email').eq('id', user.id).single()
+    ])
+
+    if (activityRes.data && profileRes.data) {
+      const name = profileRes.data.full_name || profileRes.data.email.split('@')[0] || 'Algú'
+      const { title, day_of_week, weekend_date } = activityRes.data
+
+      sendPushNotification({
+        headings: 'S\'apunten a un pla! 🙌',
+        contents: `${name} s'ha apuntat al pla "${title}" pel ${day_of_week}.`,
+        date: weekend_date,
+        excludedUserId: user.id
+      })
+    }
+  } else {
+    // Sortir del pla (aquí normalment no enviem notificació per no saturar)
+    const { error } = await supabase.from('activity_participants').delete().eq('activity_id', activityId).eq('user_id', user.id)
+    if (error) throw error
+  }
 
   revalidatePath('/')
 }

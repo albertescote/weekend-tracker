@@ -16,6 +16,9 @@ export default function WeekendSelector() {
   const selectedDateStr = searchParams.get('date') || formatDbDate(getNextWeekends()[0])
   const weekends = getNextWeekends(10)
 
+  // Comprovem si la data actual està a la llista ràpida
+  const isDateInQuickList = weekends.some(d => formatDbDate(d) === selectedDateStr)
+
   const handleSelectDate = (date: Date) => {
     const dateStr = formatDbDate(date)
     startTransition(() => {
@@ -33,10 +36,8 @@ export default function WeekendSelector() {
 
   return (
     <>
-      {/* GLOBAL NAVIGATION LOADER */}
       {isPending && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-          {/* Simple semi-transparent overlay without blur to keep text crisp */}
           <div className="bg-white/40 dark:bg-black/40 absolute inset-0" />
           <div className="bg-white dark:bg-zinc-900 px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 animate-in fade-in zoom-in duration-200 relative">
             <Loader2 size={20} className="animate-spin text-blue-500" />
@@ -79,13 +80,20 @@ export default function WeekendSelector() {
           )
         })}
 
+        {/* BOTÓ CALENDARI AMB ESTAT SELECCIONAT */}
         <button
           onClick={() => setIsModalOpen(true)}
           disabled={isPending}
-          className="flex-shrink-0 flex flex-col items-center justify-center min-w-[100px] p-4 rounded-3xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors disabled:opacity-50"
+          className={`flex-shrink-0 flex flex-col items-center justify-center min-w-[100px] p-4 rounded-3xl border-2 transition-all ${
+            !isDateInQuickList
+              ? 'bg-zinc-900 border-zinc-900 text-white shadow-lg scale-105'
+              : 'border-dashed border-zinc-200 dark:border-zinc-800 text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
+          } disabled:opacity-50`}
         >
           <Calendar size={24} />
-          <span className="text-[10px] font-bold uppercase tracking-widest mt-2">Més</span>
+          <span className="text-[10px] font-bold uppercase tracking-widest mt-2">
+            {!isDateInQuickList ? 'Altra data' : 'Més'}
+          </span>
         </button>
       </div>
 
