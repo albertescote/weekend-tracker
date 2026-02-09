@@ -9,27 +9,35 @@ export async function createActivity(formData: FormData) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
+  const { data: profile } = await supabase.from('profiles').select('full_name, email').eq('id', user.id).single()
+
   const title = formData.get('title') as string
-  const description = formData.get('description') as string
   const start_time = formData.get('start_time') as string
+  const day_of_week = formData.get('day_of_week') as string
   const weekend_date = formData.get('weekend_date') as string
+  const description = formData.get('description') as string
 
   const { error } = await supabase
     .from('activities')
-    .insert({
-      title,
-      description,
-      start_time,
-      weekend_date,
-      creator_id: user.id
+    .insert({ 
+      title, 
+      weekend_date, 
+      creator_id: user.id, 
+      start_time, 
+      day_of_week,
+      description 
     })
 
   if (error) throw error
 
-  // Notifiquem a tothom del nou pla
+  const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
+
   sendPushNotification({
-    headings: 'Nou pla proposat! 📝',
-    contents: `${title}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
+    templateData: {
+      name: name,
+      answer: `ha proposat un pla: ${title}`,
+      weekend: `${day_of_week}${start_time ? ` a les ${start_time}` : ''}`
+    },
     excludedUserId: user.id
   })
 
@@ -40,14 +48,7 @@ export async function deleteActivity(activityId: string) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
-
-  const { error } = await supabase
-    .from('activities')
-    .delete()
-    .eq('id', activityId)
-    .eq('creator_id', user.id)
-
-  if (error) throw error
+  await supabase.from('activities').delete().eq('id', activityId).eq('creator_id', user.id)
   revalidatePath('/')
 }
 
@@ -56,19 +57,8 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Unauthorized')
 
-  if (isJoining) {
-    const { error } = await supabase
-      .from('activity_participants')
-      .insert({ activity_id: activityId, user_id: user.id })
-    if (error) throw error
-  } else {
-    const { error } = await supabase
-      .from('activity_participants')
-      .delete()
-      .eq('activity_id', activityId)
-      .eq('user_id', user.id)
-    if (error) throw error
-  }
+  if (isJoining) await supabase.from('activity_participants').insert({ activity_id: activityId, user_id: user.id })
+  else await supabase.from('activity_participants').delete().eq('activity_id', activityId).eq('user_id', user.id)
 
   revalidatePath('/')
 }

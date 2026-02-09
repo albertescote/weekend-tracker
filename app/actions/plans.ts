@@ -26,36 +26,33 @@ export async function updateStatus(
       { onConflict: 'user_id, weekend_date' }
     )
 
-  if (error) {
-    console.error('Error updating status:', error)
-    throw new Error('Failed to update status')
-  }
+  if (error) throw new Error('Failed to update status')
 
-  // LÒGICA DE LA NOTIFICACIÓ DINÀMICA
   const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
-  
-  // Calculem la frase de la data
   const upcomingFriday = getUpcomingFriday()
   const isUpcoming = isSameDay(parseISO(weekendDate), upcomingFriday)
   
-  let dateText = ''
+  let weekendText = ''
   if (isUpcoming) {
-    dateText = 'aquest cap de setmana'
+    weekendText = 'aquest cap de setmana'
   } else {
     const anchorDate = parseISO(weekendDate)
     const sat = addDays(anchorDate, 1)
     const sun = addDays(anchorDate, 2)
-    dateText = `el ${format(sat, 'd')}-${format(sun, 'd')} de ${format(anchorDate, 'MMMM', { locale: ca })}`
+    weekendText = `el ${format(sat, 'd')}-${format(sun, 'd')} de ${format(anchorDate, 'MMMM', { locale: ca })}`
   }
 
-  let statusAction = ''
-  if (status === 'going') statusAction = `anirà a Valls`
-  else if (status === 'not_going') statusAction = `NO anirà a Valls`
-  else statusAction = `no sap si anirà a Valls`
+  let answerText = ''
+  if (status === 'going') answerText = `ha dit que anirà a Valls`
+  else if (status === 'not_going') answerText = `ha dit que NO anirà a Valls`
+  else answerText = `no sap si anirà a Valls`
 
   sendPushNotification({
-    headings: 'Actualització de plans',
-    contents: `${name} ha dit que ${statusAction} ${dateText}!`,
+    templateData: {
+      name: name,
+      answer: answerText,
+      weekend: weekendText
+    },
     excludedUserId: userId
   })
 

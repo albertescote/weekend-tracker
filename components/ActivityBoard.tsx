@@ -5,6 +5,7 @@ import NewActivityForm from './NewActivityForm'
 export default async function ActivityBoard({ weekendDate, currentUserId }: { weekendDate: string, currentUserId: string }) {
   const supabase = await createClient()
 
+  // Ordenem per una lògica personalitzada de dies i després per hora
   const { data: activities } = await supabase
     .from('activities')
     .select(`
@@ -19,12 +20,20 @@ export default async function ActivityBoard({ weekendDate, currentUserId }: { we
       )
     `)
     .eq('weekend_date', weekendDate)
-    .order('created_at', { ascending: true })
+
+  // Ordenació manual per dies de la setmana i hora
+  const dayOrder: { [key: string]: number } = { 'divendres': 1, 'dissabte': 2, 'diumenge': 3 };
+  const sortedActivities = activities?.sort((a, b) => {
+    if (dayOrder[a.day_of_week] !== dayOrder[b.day_of_week]) {
+      return dayOrder[a.day_of_week] - dayOrder[b.day_of_week];
+    }
+    return (a.start_time || '').localeCompare(b.start_time || '');
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
-        {activities?.map((activity) => (
+        {sortedActivities?.map((activity) => (
           <ActivityCard 
             key={activity.id} 
             activity={activity as any} 

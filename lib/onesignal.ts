@@ -1,12 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 
 export async function sendPushNotification({ 
-  headings, 
-  contents, 
+  templateData,
   excludedUserId 
 }: { 
-  headings: string, 
-  contents: string, 
+  templateData: { name: string, answer: string, weekend: string }, 
   excludedUserId?: string 
 }) {
   const supabase = createClient(
@@ -14,23 +12,16 @@ export async function sendPushNotification({
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // 1. Agafem tots els usuaris que tenen OneSignal ID, opcionalment excloent qui fa l'acció
-  let query = supabase
+  const { data: profiles } = await supabase
     .from('profiles')
     .select('onesignal_id')
     .not('onesignal_id', 'is', null)
-
-  if (excludedUserId) {
-    query = query.not('id', 'eq', excludedUserId)
-  }
-
-  const { data: profiles } = await query
+    .not('id', 'eq', excludedUserId || '')
 
   if (!profiles || profiles.length === 0) return
 
   const playerIds = profiles.map(p => p.onesignal_id)
 
-  // 2. Enviem a OneSignal
   try {
     await fetch('https://onesignal.com/api/v1/notifications', {
       method: 'POST',
@@ -41,9 +32,13 @@ export async function sendPushNotification({
       body: JSON.stringify({
         app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
         include_player_ids: playerIds,
-        headings: { en: headings, ca: headings },
-        contents: { en: contents, ca: contents },
-        url: "https://weekend-tracker-five.vercel.app"
+        template_id: process.env.ONESIGNAL_TEMPLATE_ID, // ID de la plantilla de OneSignal
+        data: templateData, // Passem les variables per si les vols usar en filtres
+        contents: { 
+          // OneSignal permet usar {{variable}} en la plantilla que es mapegen des d'aquí
+          en: `${templateData.name} ${templateData.answer} ${templateData.weekend}`,
+          ca: `${templateData.name} ${templateData.answer} ${templateData.weekend}`
+        }
       })
     })
   } catch (e) {

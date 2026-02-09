@@ -34,11 +34,17 @@ export async function GET(request: Request) {
       'Authorization': `Basic ${process.env.ONESIGNAL_REST_API_KEY}`
     },
     body: JSON.stringify({
-      app_id: process.env.ONESIGNAL_APP_ID,
+      app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
       include_player_ids: playerIds,
-      contents: { en: "Are you coming home this weekend? 🏡 Update your status now!" },
-      headings: { en: "Weekend Tracker" },
-      url: "https://weekend-tracker.vercel.app"
+      contents: { 
+        en: "Vens a Valls aquest cap de setmana? 🏡 Actualitza el teu estat ara!",
+        ca: "Vens a Valls aquest cap de setmana? 🏡 Actualitza el teu estat ara!" 
+      },
+      headings: { 
+        en: "WEEKEND 🏡",
+        ca: "WEEKEND 🏡"
+      },
+      url: "https://weekend-tracker-five.vercel.app"
     })
   })
 
