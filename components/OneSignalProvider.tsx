@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Bell } from 'lucide-react'
 
 export default function OneSignalProvider({ userId }: { userId: string | undefined }) {
-  const [isSubscribed, setIsSubscribed] = useState(true) // Default to true to avoid flicker
+  const [isSubscribed, setIsSubscribed] = useState(true)
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
@@ -14,10 +14,16 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
     const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID
     if (!appId) return
 
+    // Create the command queue if it doesn't exist
+    const OneSignal = (window as any).OneSignal || []
+    if (!(window as any).OneSignal) {
+      (window as any).OneSignal = OneSignal
+    }
+
     const syncSubscription = async () => {
-      const OneSignal = (window as any).OneSignal
-      const id = OneSignal.User.PushSubscription.id
-      const optedIn = OneSignal.User.PushSubscription.optedIn
+      const OS = (window as any).OneSignal
+      const id = OS.User.PushSubscription.id
+      const optedIn = OS.User.PushSubscription.optedIn
       
       setIsSubscribed(optedIn)
 
@@ -31,24 +37,29 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
     }
 
     const init = async () => {
-      const OneSignal = (window as any).OneSignal
-      try {
-        await OneSignal.init({
-          appId: appId,
-          allowLocalhostAsSecureOrigin: true,
-        })
-        
-        setInitialized(true)
-        await syncSubscription()
+      const OS = (window as any).OneSignal
+      
+      // Use push to ensure the SDK is fully loaded and ready
+      OS.push(async () => {
+        try {
+          await OS.init({
+            appId: appId,
+            allowLocalhostAsSecureOrigin: true,
+          })
+          
+          setInitialized(true)
+          await syncSubscription()
 
-        OneSignal.User.PushSubscription.addEventListener("change", syncSubscription)
-      } catch (e) {
-        console.error('OneSignal initialization failed', e)
-      }
+          OS.User.PushSubscription.addEventListener("change", syncSubscription)
+        } catch (e) {
+          console.error('OneSignal execution failed', e)
+        }
+      })
     }
 
-    if (!(window as any).OneSignal) {
+    if (!document.getElementById('onesignal-sdk')) {
       const script = document.createElement('script')
+      script.id = 'onesignal-sdk'
       script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'
       script.async = true
       document.head.appendChild(script)
@@ -59,9 +70,12 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
   }, [userId])
 
   const handleSubscribe = async () => {
-    const OneSignal = (window as any).OneSignal
-    if (!OneSignal) return
-    await OneSignal.Slidedown.promptPush()
+    const OS = (window as any).OneSignal
+    if (OS) {
+      OS.push(async () => {
+        await OS.Slidedown.promptPush()
+      })
+    }
   }
 
   if (!userId || isSubscribed || !initialized) return null
