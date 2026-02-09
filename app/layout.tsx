@@ -33,6 +33,7 @@ export const viewport: Viewport = {
 
 import OneSignalProvider from "@/components/OneSignalProvider";
 import { createClient } from "@/lib/supabase/server";
+import Script from "next/script";
 
 export default async function RootLayout({
   children,
@@ -47,6 +48,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script
+          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+          strategy="afterInteractive"
+        />
         <OneSignalProvider userId={user?.id} />
         {children}
       </body>

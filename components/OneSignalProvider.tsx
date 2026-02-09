@@ -1,30 +1,25 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Bell } from 'lucide-react'
 
 export default function OneSignalProvider({ userId }: { userId: string | undefined }) {
   const [isSubscribed, setIsSubscribed] = useState(true)
   const [initialized, setInitialized] = useState(false)
+  const initRef = useRef(false)
 
   useEffect(() => {
-    if (!userId) return
-
+    if (!userId || initRef.current) return
+    
     const appId = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID
     if (!appId) return
 
-    // Create the command queue if it doesn't exist
-    const OneSignal = (window as any).OneSignal || []
-    if (!(window as any).OneSignal) {
-      (window as any).OneSignal = OneSignal
-    }
+    initRef.current = true
 
-    const syncSubscription = async () => {
-      const OS = (window as any).OneSignal
-      const id = OS.User.PushSubscription.id
-      const optedIn = OS.User.PushSubscription.optedIn
-      
+    const syncSubscription = async (OneSignal: any) => {
+      const id = OneSignal.User.PushSubscription.id
+      const optedIn = OneSignal.User.PushSubscription.optedIn
       setIsSubscribed(optedIn)
 
       if (id && optedIn) {
@@ -36,45 +31,38 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
       }
     }
 
-    const init = async () => {
-      const OS = (window as any).OneSignal
-      
-      // Use push to ensure the SDK is fully loaded and ready
-      OS.push(async () => {
+    const runInit = async () => {
+      const OneSignal = (window as any).OneSignal
+      if (!OneSignal) {
+        // If not loaded yet, wait and try again
+        setTimeout(runInit, 500)
+        return
+      }
+
+      await OneSignal.push(async () => {
         try {
-          await OS.init({
+          await OneSignal.init({
             appId: appId,
             allowLocalhostAsSecureOrigin: true,
           })
           
           setInitialized(true)
-          await syncSubscription()
+          await syncSubscription(OneSignal)
 
-          OS.User.PushSubscription.addEventListener("change", syncSubscription)
+          OneSignal.User.PushSubscription.addEventListener("change", () => syncSubscription(OneSignal))
         } catch (e) {
-          console.error('OneSignal execution failed', e)
+          console.error('OneSignal initialization error:', e)
         }
       })
     }
 
-    if (!document.getElementById('onesignal-sdk')) {
-      const script = document.createElement('script')
-      script.id = 'onesignal-sdk'
-      script.src = 'https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js'
-      script.async = true
-      document.head.appendChild(script)
-      script.onload = init
-    } else {
-      init()
-    }
+    runInit()
   }, [userId])
 
   const handleSubscribe = async () => {
-    const OS = (window as any).OneSignal
-    if (OS) {
-      OS.push(async () => {
-        await OS.Slidedown.promptPush()
-      })
+    const OneSignal = (window as any).OneSignal
+    if (OneSignal) {
+      await OneSignal.Slidedown.promptPush()
     }
   }
 
