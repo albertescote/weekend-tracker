@@ -31,16 +31,23 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default function RootLayout({
+import OneSignalProvider from "@/components/OneSignalProvider";
+import { createClient } from "@/lib/supabase/server";
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <OneSignalProvider userId={user?.id} />
         {children}
       </body>
     </html>
