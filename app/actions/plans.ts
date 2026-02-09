@@ -3,6 +3,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendPushNotification } from '@/lib/onesignal'
+import { format, parseISO, addDays, isSameDay } from 'date-fns'
+import { ca, getUpcomingFriday } from '@/lib/utils'
 
 export async function updateStatus(
   userId: string,
@@ -11,7 +13,6 @@ export async function updateStatus(
 ) {
   const supabase = await createClient()
 
-  // Agafem el nom de l'usuari per la notificació
   const { data: profile } = await supabase
     .from('profiles')
     .select('full_name, email')
@@ -30,14 +31,31 @@ export async function updateStatus(
     throw new Error('Failed to update status')
   }
 
-  // Enviem la notificació a la resta
-  const name = profile?.full_name || profile?.email.split('@')[0] || 'Algu'
-  const statusText = status === 'going' ? 've!' : status === 'not_going' ? 'no vindrà.' : 'no ho sap segur...'
+  // LÒGICA DE LA NOTIFICACIÓ DINÀMICA
+  const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
   
-  // No esperem a que s'enviï per no bloquejar la UI
+  // Calculem la frase de la data
+  const upcomingFriday = getUpcomingFriday()
+  const isUpcoming = isSameDay(parseISO(weekendDate), upcomingFriday)
+  
+  let dateText = ''
+  if (isUpcoming) {
+    dateText = 'aquest cap de setmana'
+  } else {
+    const anchorDate = parseISO(weekendDate)
+    const sat = addDays(anchorDate, 1)
+    const sun = addDays(anchorDate, 2)
+    dateText = `el ${format(sat, 'd')}-${format(sun, 'd')} de ${format(anchorDate, 'MMMM', { locale: ca })}`
+  }
+
+  let statusAction = ''
+  if (status === 'going') statusAction = `anirà a Valls`
+  else if (status === 'not_going') statusAction = `NO anirà a Valls`
+  else statusAction = `no sap si anirà a Valls`
+
   sendPushNotification({
-    headings: 'Novetats al Weekend!',
-    contents: `${name} ha dit que ${statusText}`,
+    headings: 'Actualització de plans',
+    contents: `${name} ha dit que ${statusAction} ${dateText}!`,
     excludedUserId: userId
   })
 
