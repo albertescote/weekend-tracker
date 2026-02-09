@@ -32,6 +32,7 @@ export const viewport: Viewport = {
 };
 
 import OneSignalProvider from "@/components/OneSignalProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { createClient } from "@/lib/supabase/server";
 import Script from "next/script";
 
@@ -44,16 +45,18 @@ export default async function RootLayout({
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased transition-colors duration-300`}
       >
         <Script
           src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
           strategy="afterInteractive"
         />
-        <OneSignalProvider userId={user?.id} />
-        {children}
+        <ThemeProvider>
+          <OneSignalProvider userId={user?.id} />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

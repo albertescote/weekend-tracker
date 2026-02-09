@@ -26,11 +26,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-zinc-50 dark:bg-black">
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background text-foreground">
       <div className="w-full max-w-sm space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 text-center">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Weekend Tracker</h1>
-          <p className="text-zinc-500">Sign in to track your weekend with the squad</p>
+          <p className="text-zinc-500">Inicia sessió per organitzar el cap de setmana amb la colla</p>
         </div>
 
         <div className="py-4">
@@ -61,7 +61,7 @@ export default function LoginPage() {
                 />
               </svg>
             )}
-            {loading ? 'Connecting...' : 'Continue with Google'}
+            {loading ? 'Connectant...' : 'Continua amb Google'}
           </button>
         </div>
 
@@ -72,7 +72,7 @@ export default function LoginPage() {
         )}
 
         <p className="text-xs text-zinc-400 px-4">
-          By signing in, you agree to track your weekend plans with your friends.
+          En iniciar sessió, acceptes compartir els teus plans amb els teus amics.
         </p>
       </div>
     </div>

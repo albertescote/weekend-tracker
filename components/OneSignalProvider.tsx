@@ -75,7 +75,7 @@ export default function OneSignalProvider({ userId }: { userId: string | undefin
         className="flex items-center gap-2 bg-zinc-900 text-white px-5 py-3 rounded-full shadow-xl hover:bg-zinc-800 active:scale-95 transition-all font-bold text-sm"
       >
         <Bell size={18} />
-        Enable Notifications
+        Activa Notificacions
       </button>
     </div>
   )

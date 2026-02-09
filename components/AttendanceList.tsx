@@ -1,16 +1,5 @@
-interface Profile {
-  full_name: string | null
-  avatar_url: string | null
-  email: string
-}
-
-interface Plan {
-  status: string
-  profiles: Profile
-}
-
 interface Props {
-  plans: any[] // Using any for now, should use generated types
+  plans: any[]
 }
 
 export default function AttendanceList({ plans }: Props) {
@@ -20,9 +9,9 @@ export default function AttendanceList({ plans }: Props) {
 
   return (
     <div className="w-full max-w-md space-y-8">
-      <Section title="Going" users={going} color="text-green-500" />
-      <Section title="Not Going" users={notGoing} color="text-red-500" />
-      <Section title="Maybe" users={pending} color="text-zinc-500" />
+      <Section title="SÍ" users={going} color="text-green-500" />
+      <Section title="NO" users={notGoing} color="text-red-500" />
+      <Section title="POTSER" users={pending} color="text-zinc-500" />
     </div>
   )
 }
@@ -39,9 +28,9 @@ function Section({ title, users, color }: { title: string; users: any[]; color: 
         {users.map((plan, i) => (
           <div
             key={i}
-            className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800"
+            className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm"
           >
-            <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center overflow-hidden">
+            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-100 dark:border-zinc-700">
               {plan.profiles.avatar_url ? (
                 <img src={plan.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -50,7 +39,7 @@ function Section({ title, users, color }: { title: string; users: any[]; color: 
                 </span>
               )}
             </div>
-            <span className="font-medium">
+            <span className="font-semibold text-sm">
               {plan.profiles.full_name || plan.profiles.email.split('@')[0]}
             </span>
           </div>
