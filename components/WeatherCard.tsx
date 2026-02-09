@@ -20,7 +20,7 @@ export default async function WeatherCard({ date }: { date: string }) {
           {getWeatherIcon(weather.code)}
         </div>
         <div>
-          <p className="text-[10px] font-black uppercase text-blue-500 tracking-widest">El temps a casa</p>
+          <p className="text-[10px] font-black uppercase text-blue-500 tracking-widest">El temps a Valls</p>
           <p className="text-xl font-black text-zinc-950 dark:text-white leading-tight">
             {getWeatherDescription(weather.code)}
           </p>
