@@ -31,7 +31,9 @@ export default async function WeatherCard({ date }: { date: string }) {
           <Thermometer size={14} className="text-red-500" />
           <span className="text-2xl font-black">{weather.maxTemp}°</span>
         </div>
-        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter">Mínima de {weather.minTemp}°</p>
+        <p className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter whitespace-nowrap">
+          Mínima de {weather.minTemp}°
+        </p>
       </div>
     </div>
   )

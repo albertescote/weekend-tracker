@@ -64,6 +64,8 @@ export default function ProfileModal({ user, profile, onClose }: Props) {
     }
   }
 
+  const isDirty = fullName !== (profile?.full_name || '') || avatarUrl !== (profile?.avatar_url || '')
+
   return (
     <Portal>
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto overflow-x-hidden">
@@ -134,6 +136,15 @@ export default function ProfileModal({ user, profile, onClose }: Props) {
 
               <div className="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex flex-col gap-4">
                 <button
+                  type="submit"
+                  disabled={loading || !isDirty}
+                  className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {loading && <Loader2 size={20} className="animate-spin" />}
+                  GUARDAR CANVIS
+                </button>
+
+                <button
                   type="button"
                   onClick={async () => {
                     if (confirm('Segur que vols tancar la sessió?')) {
@@ -144,15 +155,6 @@ export default function ProfileModal({ user, profile, onClose }: Props) {
                 >
                   <LogOut size={20} />
                   TANCAR SESSIÓ
-                </button>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {loading && <Loader2 size={20} className="animate-spin" />}
-                  GUARDAR CANVIS
                 </button>
               </div>
             </form>
