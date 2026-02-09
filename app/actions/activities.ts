@@ -3,6 +3,25 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendPushNotification } from '@/lib/onesignal'
+import { parseISO, isSameDay, addDays, format } from 'date-fns'
+import { ca, getUpcomingFriday } from '@/lib/utils'
+
+function getFormattedDayText(weekendDate: string, dayOfWeek: string) {
+  const upcomingFriday = getUpcomingFriday()
+  const anchorDate = parseISO(weekendDate)
+  const isUpcoming = isSameDay(anchorDate, upcomingFriday)
+
+  // Calculem la data real de l'esdeveniment basat en el dia triat
+  let eventDate = anchorDate
+  if (dayOfWeek === 'dissabte') eventDate = addDays(anchorDate, 1)
+  if (dayOfWeek === 'diumenge') eventDate = addDays(anchorDate, 2)
+
+  if (isUpcoming) {
+    return `aquest ${dayOfWeek}`
+  } else {
+    return `${dayOfWeek} ${format(eventDate, "d 'de' MMMM", { locale: ca })}`
+  }
+}
 
 export async function createActivity(formData: FormData) {
   const supabase = await createClient()
@@ -24,10 +43,11 @@ export async function createActivity(formData: FormData) {
   if (error) throw error
 
   const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
+  const dayText = getFormattedDayText(weekend_date, day_of_week)
 
   sendPushNotification({
     headings: 'Nou pla proposat! 📝',
-    contents: `${name} ha proposat: ${title} ${day_of_week}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
+    contents: `${name} ha proposat: ${title} ${dayText}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
     date: weekend_date,
     excludedUserId: user.id
   })
@@ -49,11 +69,9 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
   if (!user) throw new Error('Unauthorized')
 
   if (isJoining) {
-    // 1. Unir-se al pla
     const { error } = await supabase.from('activity_participants').insert({ activity_id: activityId, user_id: user.id })
     if (error) throw error
 
-    // 2. Notificació: Recuperem dades de l'activitat i de l'usuari
     const [activityRes, profileRes] = await Promise.all([
       supabase.from('activities').select('title, day_of_week, weekend_date').eq('id', activityId).single(),
       supabase.from('profiles').select('full_name, email').eq('id', user.id).single()
@@ -62,16 +80,16 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
     if (activityRes.data && profileRes.data) {
       const name = profileRes.data.full_name || profileRes.data.email.split('@')[0] || 'Algú'
       const { title, day_of_week, weekend_date } = activityRes.data
+      const dayText = getFormattedDayText(weekend_date, day_of_week)
 
       sendPushNotification({
-        headings: 'Això s\'anima!🚀🍻',
-        contents: `${name} s'ha apuntat al pla "${title}" pel ${day_of_week}.`,
+        headings: 'Això s\'anima!🚀',
+        contents: `${name} s'ha apuntat al pla "${title}" pel ${dayText}.`,
         date: weekend_date,
         excludedUserId: user.id
       })
     }
   } else {
-    // Sortir del pla (aquí normalment no enviem notificació per no saturar)
     const { error } = await supabase.from('activity_participants').delete().eq('activity_id', activityId).eq('user_id', user.id)
     if (error) throw error
   }

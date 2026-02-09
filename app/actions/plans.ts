@@ -43,12 +43,21 @@ export async function updateStatus(
   }
 
   let statusAction = ''
-  if (status === 'going') statusAction = `anirà a Valls`
-  else if (status === 'not_going') statusAction = `NO anirà a Valls`
-  else statusAction = `no sap si anirà a Valls`
+  let funHeading = ''
+
+  if (status === 'going') {
+    statusAction = `anirà a Valls`
+    funHeading = 'Un més al sac! 🍻'
+  } else if (status === 'not_going') {
+    statusAction = `NO anirà a Valls`
+    funHeading = 'T\'enyorarem... 😢'
+  } else {
+    statusAction = `no sap si anirà a Valls`
+    funHeading = 'Massa dubtes 🤔'
+  }
 
   sendPushNotification({
-    headings: 'Actualització de plans' + (status === 'going' ? ' ✅' : status === 'not_going' ? ' ❌' : ' ❓'),
+    headings: funHeading,
     contents: `${name} ha dit que ${statusAction} ${dateText}!`,
     date: weekendDate,
     excludedUserId: userId
