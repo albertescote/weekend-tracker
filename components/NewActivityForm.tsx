@@ -2,11 +2,19 @@
 
 import { useState } from 'react'
 import { createActivity } from '@/app/actions/activities'
-import { Plus, X } from 'lucide-react'
+import { Plus, X, Clock } from 'lucide-react'
+import { parseISO, addDays, format } from 'date-fns'
 
 export default function NewActivityForm({ weekendDate }: { weekendDate: string }) {
   const [isOpen, setIsOpen] = useState(false)
   const [selectedDay, setSelectedDay] = useState('dissabte')
+
+  const anchorDate = parseISO(weekendDate)
+  const daysData = [
+    { id: 'divendres', label: 'Div', date: anchorDate },
+    { id: 'dissabte', label: 'Dis', date: addDays(anchorDate, 1) },
+    { id: 'diumenge', label: 'Diu', date: addDays(anchorDate, 2) },
+  ]
 
   if (!isOpen) {
     return (
@@ -44,18 +52,19 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
       <div className="space-y-4">
         {/* Selector de Dia */}
         <div className="flex gap-2 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-2xl">
-          {['divendres', 'dissabte', 'diumenge'].map((day) => (
+          {daysData.map((day) => (
             <button
-              key={day}
+              key={day.id}
               type="button"
-              onClick={() => setSelectedDay(day)}
-              className={`flex-1 py-2 text-[10px] font-black uppercase tracking-wider rounded-xl transition-all ${
-                selectedDay === day 
-                  ? 'bg-white dark:bg-zinc-700 text-zinc-950 dark:text-white shadow-sm' 
+              onClick={() => setSelectedDay(day.id)}
+              className={`flex-1 py-2 flex flex-col items-center rounded-xl transition-all ${
+                selectedDay === day.id 
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-950 dark:text-white shadow-sm scale-[1.02]' 
                   : 'text-zinc-400'
               }`}
             >
-              {day.slice(0, 2)}
+              <span className="text-[10px] font-black uppercase tracking-wider leading-none">{day.label}</span>
+              <span className="text-sm font-bold mt-0.5">{format(day.date, 'd')}</span>
             </button>
           ))}
         </div>
@@ -67,12 +76,17 @@ export default function NewActivityForm({ weekendDate }: { weekendDate: string }
           className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold"
         />
         
-        <div className="flex gap-3">
+        {/* Camp d'hora millorat amb icona i label */}
+        <div className="space-y-1.5">
+          <label className="flex items-center gap-2 text-[10px] font-black text-zinc-400 uppercase tracking-widest px-1">
+            <Clock size={12} />
+            A quina hora?
+          </label>
           <input
             name="start_time"
             type="time"
-            placeholder="Hora"
-            className="flex-1 px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold text-zinc-950 dark:text-white"
+            required
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold text-zinc-950 dark:text-white appearance-none"
           />
         </div>
 

@@ -19,6 +19,7 @@ interface Activity {
   title: string
   description: string | null
   start_time: string | null
+  day_of_week: string
   activity_participants: Participant[]
 }
 
@@ -31,7 +32,6 @@ export default function ActivityCard({ activity, currentUserId }: { activity: Ac
     activity.activity_participants,
     (state, isJoining: boolean) => {
       if (isJoining) {
-        // Use 'T' for 'Tu' during optimistic state
         return [...state, { user_id: currentUserId, profiles: { full_name: 'Tu', avatar_url: null, email: '' } }]
       }
       return state.filter(p => p.user_id !== currentUserId)
@@ -53,11 +53,20 @@ export default function ActivityCard({ activity, currentUserId }: { activity: Ac
     })
   }
 
+  const dayLabels: { [key: string]: string } = {
+    'divendres': 'Div',
+    'dissabte': 'Dis',
+    'diumenge': 'Diu'
+  }
+
   return (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-5 rounded-3xl shadow-sm space-y-4 relative">
       <div className="flex justify-between items-start gap-4">
         <div className="space-y-1 flex-1 min-w-0">
           <div className="flex items-center gap-2">
+            <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider">
+              {dayLabels[activity.day_of_week]}
+            </span>
             <h4 className="font-bold text-lg leading-tight text-zinc-950 dark:text-white truncate">{activity.title}</h4>
             {isCreator && (
               <button 
