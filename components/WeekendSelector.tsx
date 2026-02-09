@@ -36,10 +36,13 @@ export default function WeekendSelector() {
       {/* GLOBAL NAVIGATION LOADER */}
       {isPending && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center pointer-events-none">
-          <div className="bg-zinc-900/10 dark:bg-white/10 backdrop-blur-[2px] absolute inset-0" />
-          <div className="bg-white dark:bg-zinc-900 p-4 rounded-full shadow-2xl border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 animate-in fade-in zoom-in duration-200">
-            <Loader2 size={24} className="animate-spin text-blue-500" />
-            <span className="text-xs font-bold uppercase tracking-widest text-zinc-500">Carregant...</span>
+          {/* Simple semi-transparent overlay without blur to keep text crisp */}
+          <div className="bg-white/40 dark:bg-black/40 absolute inset-0" />
+          <div className="bg-white dark:bg-zinc-900 px-6 py-4 rounded-full shadow-[0_20px_50px_rgba(0,0,0,0.2)] border border-zinc-100 dark:border-zinc-800 flex items-center gap-3 animate-in fade-in zoom-in duration-200 relative">
+            <Loader2 size={20} className="animate-spin text-blue-500" />
+            <span className="text-xs font-black uppercase tracking-[0.1em] text-zinc-950 dark:text-white">
+              Carregant...
+            </span>
           </div>
         </div>
       )}
@@ -61,7 +64,7 @@ export default function WeekendSelector() {
                 isSelected
                   ? 'bg-zinc-900 border-zinc-900 text-white shadow-lg scale-105'
                   : 'bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 text-zinc-500 hover:bg-zinc-50'
-              } ${isPending ? 'opacity-50 grayscale-[0.5]' : ''}`}
+              } ${isPending && isSelected ? '' : isPending ? 'opacity-50' : ''}`}
             >
               <span className="text-[10px] font-bold uppercase tracking-widest opacity-60">
                 {format(friday, 'MMM', { locale: ca })}
