@@ -8,6 +8,7 @@ import HallOfFame from '@/components/HallOfFame'
 import ThemeToggle from '@/components/ThemeToggle'
 import ActivityBoard from '@/components/ActivityBoard'
 import ProfileButton from '@/components/ProfileButton'
+import PullToRefresh from '@/components/PullToRefresh'
 import { format, parseISO, addDays } from 'date-fns'
 import { Suspense } from 'react'
 
@@ -17,19 +18,16 @@ export default async function Home({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const supabase = await createClient()
-  
-  // 1. Core Auth Check (Fastest possible)
   const { data: { user } } = await supabase.auth.getUser()
-  
+
   const params = await searchParams
   const selectedDateStr = (params.date as string) || formatDbDate(getUpcomingFriday())
-  
+
   const anchorDate = parseISO(selectedDateStr)
   const sat = addDays(anchorDate, 1)
   const sun = addDays(anchorDate, 2)
   const displayDate = `${format(sat, "d 'de' MMM", { locale: ca })} - ${format(sun, "d 'de' MMM", { locale: ca })}`
 
-  // 2. Parallel Fetching for Profile and User Status
   const [profileResponse, userPlanResponse] = user ? await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase.from('weekend_plans').select('status').eq('user_id', user.id).eq('weekend_date', selectedDateStr).single()
@@ -40,8 +38,10 @@ export default async function Home({
   const userStatus: 'going' | 'not_going' | 'pending' = (userPlan?.status as any) || 'pending'
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300">
-      {/* 1. TOP BAR (Sticky) - Solid White/Black */}
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300 overflow-x-hidden">
+      <PullToRefresh />
+
+      {/* 1. TOP BAR (Sticky) */}
       <div className="w-full bg-background sticky top-0 z-40 px-6 pt-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
         <header className="flex items-start justify-between w-full max-w-md mx-auto">
           <div className="flex flex-col">
@@ -49,9 +49,11 @@ export default async function Home({
               <span>Cap de</span>
               <span>setmana</span>
             </h1>
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">{displayDate}</p>
+            <div className="flex items-center gap-2 mt-3">
+              <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em]">{displayDate}</p>
+            </div>
           </div>
-          
+
           <div className="flex items-center gap-2 mt-1">
             <ThemeToggle />
             {user && <ProfileButton user={user} profile={profile} />}
@@ -60,7 +62,7 @@ export default async function Home({
       </div>
 
       <div className="w-full max-w-md px-4 flex flex-col gap-10 pb-12">
-        
+
         {/* 2. DATE SELECTOR */}
         <section className="mt-2">
           <WeekendSelector />
@@ -84,15 +86,15 @@ export default async function Home({
                 <WeatherCard date={selectedDateStr} />
               </Suspense>
 
-              <VotingSection 
+              <VotingSection
                 key={selectedDateStr}
-                userId={user.id} 
-                weekendDate={selectedDateStr} 
-                initialStatus={userStatus} 
+                userId={user.id}
+                weekendDate={selectedDateStr}
+                initialStatus={userStatus}
                 displayDate={displayDate}
               />
             </div>
-            
+
             {/* 4. ATTENDANCE */}
             <div className="space-y-4">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-400 px-2">Qui ve?</h3>
