@@ -19,25 +19,16 @@ export async function createActivity(formData: FormData) {
 
   const { error } = await supabase
     .from('activities')
-    .insert({ 
-      title, 
-      weekend_date, 
-      creator_id: user.id, 
-      start_time, 
-      day_of_week,
-      description 
-    })
+    .insert({ title, weekend_date, creator_id: user.id, start_time, day_of_week, description })
 
   if (error) throw error
 
   const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
 
   sendPushNotification({
-    templateData: {
-      name: name,
-      answer: `ha proposat un pla: ${title}`,
-      weekend: `${day_of_week}${start_time ? ` a les ${start_time}` : ''}`
-    },
+    headings: 'Nou pla proposat! 📝',
+    contents: `${name} ha proposat: ${title} ${day_of_week}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
+    date: weekend_date,
     excludedUserId: user.id
   })
 

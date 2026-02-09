@@ -32,27 +32,25 @@ export async function updateStatus(
   const upcomingFriday = getUpcomingFriday()
   const isUpcoming = isSameDay(parseISO(weekendDate), upcomingFriday)
   
-  let weekendText = ''
+  let dateText = ''
   if (isUpcoming) {
-    weekendText = 'aquest cap de setmana'
+    dateText = 'aquest cap de setmana'
   } else {
     const anchorDate = parseISO(weekendDate)
     const sat = addDays(anchorDate, 1)
     const sun = addDays(anchorDate, 2)
-    weekendText = `el ${format(sat, 'd')}-${format(sun, 'd')} de ${format(anchorDate, 'MMMM', { locale: ca })}`
+    dateText = `el ${format(sat, 'd')}-${format(sun, 'd')} de ${format(anchorDate, 'MMMM', { locale: ca })}`
   }
 
-  let answerText = ''
-  if (status === 'going') answerText = `ha dit que anirà a Valls`
-  else if (status === 'not_going') answerText = `ha dit que NO anirà a Valls`
-  else answerText = `no sap si anirà a Valls`
+  let statusAction = ''
+  if (status === 'going') statusAction = `anirà a Valls`
+  else if (status === 'not_going') statusAction = `NO anirà a Valls`
+  else statusAction = `no sap si anirà a Valls`
 
   sendPushNotification({
-    templateData: {
-      name: name,
-      answer: answerText,
-      weekend: weekendText
-    },
+    headings: 'Actualització de plans',
+    contents: `${name} ha dit que ${statusAction} ${dateText}!`,
+    date: weekendDate,
     excludedUserId: userId
   })
 

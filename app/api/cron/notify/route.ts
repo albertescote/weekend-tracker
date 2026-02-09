@@ -26,6 +26,11 @@ export async function GET(request: Request) {
 
   const playerIds = profiles.map(p => p.onesignal_id)
 
+  // Calculem la data del proper divendres per la URL
+  const nextFriday = new Date()
+  nextFriday.setDate(nextFriday.getDate() + ((5 - nextFriday.getDay() + 7) % 7))
+  const dateStr = nextFriday.toISOString().split('T')[0]
+
   // 2. Send OneSignal Notification
   const response = await fetch('https://onesignal.com/api/v1/notifications', {
     method: 'POST',
@@ -44,7 +49,7 @@ export async function GET(request: Request) {
         en: "WEEKEND 🏡",
         ca: "WEEKEND 🏡"
       },
-      url: "https://weekend-tracker-five.vercel.app"
+      url: `https://weekend-tracker-five.vercel.app?date=${dateStr}`
     })
   })
 
