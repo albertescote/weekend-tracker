@@ -1,10 +1,9 @@
 @import "tailwindcss";
 
-/* 1. Tell Tailwind v4 to use the .dark class for the dark: variant */
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #fafafa;
+  --background: #ffffff;
   --foreground: #09090b;
   color-scheme: light;
 }
@@ -28,7 +27,6 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Helper for smooth scrolling and scrollbar hiding */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }

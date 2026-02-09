@@ -17,6 +17,8 @@ export default async function Home({
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
   const supabase = await createClient()
+  
+  // 1. Core Auth Check (Fastest possible)
   const { data: { user } } = await supabase.auth.getUser()
   
   const params = await searchParams
@@ -27,40 +29,20 @@ export default async function Home({
   const sun = addDays(anchorDate, 2)
   const displayDate = `${format(sat, "d 'de' MMM", { locale: ca })} - ${format(sun, "d 'de' MMM", { locale: ca })}`
 
-  const { data: profile } = user 
-    ? await supabase.from('profiles').select('*').eq('id', user.id).single()
-    : { data: null }
+  // 2. Parallel Fetching for Profile and User Status
+  const [profileResponse, userPlanResponse] = user ? await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase.from('weekend_plans').select('status').eq('user_id', user.id).eq('weekend_date', selectedDateStr).single()
+  ]) : [{ data: null }, { data: null }]
 
-  const { data: plans } = await supabase
-    .from('weekend_plans')
-    .select(`
-      status,
-      profiles (
-        full_name,
-        avatar_url,
-        email
-      )
-    `)
-    .eq('weekend_date', selectedDateStr)
-
-  let userStatus: 'going' | 'not_going' | 'pending' = 'pending'
-  if (user) {
-    const { data: userPlan } = await supabase
-      .from('weekend_plans')
-      .select('status')
-      .eq('user_id', user.id)
-      .eq('weekend_date', selectedDateStr)
-      .single()
-    
-    if (userPlan) {
-      userStatus = userPlan.status as any
-    }
-  }
+  const profile = profileResponse.data
+  const userPlan = userPlanResponse.data
+  const userStatus: 'going' | 'not_going' | 'pending' = (userPlan?.status as any) || 'pending'
 
   return (
-    <main className="min-h-screen bg-background text-foreground flex flex-col items-center">
-      {/* 1. TOP BAR (Sticky) */}
-      <div className="w-full bg-background/80 backdrop-blur-md sticky top-0 z-40 px-6 pt-8 pb-6 border-b border-transparent">
+    <main className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300">
+      {/* 1. TOP BAR (Sticky) - Solid White/Black */}
+      <div className="w-full bg-background sticky top-0 z-40 px-6 pt-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
         <header className="flex items-start justify-between w-full max-w-md mx-auto">
           <div className="flex flex-col">
             <h1 className="text-3xl font-black tracking-tighter leading-[0.85] text-zinc-950 dark:text-white flex flex-col">
@@ -70,13 +52,9 @@ export default async function Home({
             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">{displayDate}</p>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-1">
             <ThemeToggle />
-            {user && (
-              <div className="flex-shrink-0">
-                <ProfileButton user={user} profile={profile} />
-              </div>
-            )}
+            {user && <ProfileButton user={user} profile={profile} />}
           </div>
         </header>
       </div>
@@ -89,7 +67,7 @@ export default async function Home({
         </section>
 
         {!user ? (
-          <div className="flex flex-col items-center gap-4 text-center py-12">
+          <div className="flex flex-col items-center gap-4 text-center py-24">
             <p className="text-lg font-medium opacity-60">Connecta amb la colla.</p>
             <a
               href="/login"
@@ -102,7 +80,7 @@ export default async function Home({
           <>
             {/* 3. CONTEXTUAL WEATHER & VOTE */}
             <div className="flex flex-col gap-6">
-              <Suspense fallback={<div className="h-24 w-full bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-[2rem]" />}>
+              <Suspense fallback={<div className="h-24 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-[2rem]" />}>
                 <WeatherCard date={selectedDateStr} />
               </Suspense>
 
@@ -118,7 +96,14 @@ export default async function Home({
             {/* 4. ATTENDANCE */}
             <div className="space-y-4">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-400 px-2">Qui ve?</h3>
-              <AttendanceList plans={plans || []} />
+              <Suspense fallback={
+                <div className="space-y-3">
+                  <div className="h-16 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-2xl" />
+                  <div className="h-16 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-2xl opacity-50" />
+                </div>
+              }>
+                <AttendanceList weekendDate={selectedDateStr} />
+              </Suspense>
             </div>
 
             <hr className="border-zinc-200 dark:border-zinc-800 mx-4" />
@@ -126,7 +111,7 @@ export default async function Home({
             {/* 5. ACTIVITIES */}
             <div className="space-y-4">
               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-zinc-400 px-2">Plans</h3>
-              <Suspense fallback={<div className="h-24 w-full bg-zinc-200 animate-pulse rounded-3xl" />}>
+              <Suspense fallback={<div className="h-24 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-3xl" />}>
                 <ActivityBoard weekendDate={selectedDateStr} currentUserId={user.id} />
               </Suspense>
             </div>
@@ -135,7 +120,7 @@ export default async function Home({
 
             {/* 6. GAMIFICATION */}
             <div className="pb-8">
-              <Suspense fallback={<div className="h-40 w-full bg-zinc-200 animate-pulse rounded-3xl" />}>
+              <Suspense fallback={<div className="h-40 w-full bg-background border border-zinc-100 dark:border-zinc-800 animate-pulse rounded-3xl" />}>
                 <HallOfFame />
               </Suspense>
             </div>
