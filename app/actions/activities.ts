@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { sendPushNotification } from '@/lib/onesignal'
-import { getFormattedDayText } from '@/lib/utils'
+import {getFormattedDayText, isUpcomingWeekend} from '@/lib/utils'
 import { z } from 'zod'
 import { ActionResponse } from '@/types'
 
@@ -46,10 +46,11 @@ export async function createActivity(formData: FormData): Promise<ActionResponse
 
     const name = profile?.full_name || profile?.email.split('@')[0] || 'Algú'
     const dayText = getFormattedDayText(weekend_date, day_of_week)
+    const isUpcoming = isUpcomingWeekend(weekend_date)
 
     sendPushNotification({
       headings: 'Nou pla proposat! 📝',
-      contents: `${name} ha proposat: ${title} ${dayText}${start_time ? ` a les ${start_time}` : ''}. T'apuntes?`,
+      contents: `${name} ha proposat: ${title} ${isUpcoming ? '' : 'pel'} ${dayText}. T'apuntes?`,
       date: weekend_date,
       excludedUserId: user.id
     })

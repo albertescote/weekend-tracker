@@ -9,10 +9,15 @@ export function getUpcomingFriday() {
   return nextFriday(now);
 }
 
-export function getFormattedDayText(weekendDate: string, dayOfWeek: string) {
+export function isUpcomingWeekend(weekendDate: string) {
   const upcomingFriday = getUpcomingFriday();
   const anchorDate = parseISO(weekendDate);
-  const isUpcoming = isSameDay(anchorDate, upcomingFriday);
+  return isSameDay(anchorDate, upcomingFriday);
+}
+
+export function getFormattedDayText(weekendDate: string, dayOfWeek: string) {
+  const anchorDate = parseISO(weekendDate);
+  const isUpcoming = isUpcomingWeekend(weekendDate);
 
   // Calculem la data real de l'esdeveniment basat en el dia triat
   let eventDate = anchorDate;

@@ -11,9 +11,9 @@ export default async function HallOfFame() {
     <section className="w-full max-w-md space-y-4">
       <div className="flex items-center gap-2 px-2 text-zinc-500">
         <Trophy size={18} className="text-amber-500" />
-        <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Top Vilatans</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.2em]">Els Fixes</h3>
       </div>
-      
+
       <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-4 space-y-3 shadow-sm">
         {winners.map((user: any, i: number) => (
           <div key={i} className="flex items-center justify-between group">
