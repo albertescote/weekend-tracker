@@ -1,11 +1,42 @@
 import { createClient } from '@/lib/supabase/server'
 import { Trophy } from 'lucide-react'
+import { formatDbDate } from '@/lib/utils'
 
 export default async function HallOfFame() {
   const supabase = await createClient()
-  const { data: winners } = await supabase.rpc('get_hall_of_fame')
+  const today = formatDbDate(new Date())
 
-  if (!winners || winners.length === 0) return null
+  // Fetch all "going" plans for dates that have already passed (or are today)
+  const { data: plans } = await supabase
+    .from('weekend_plans')
+    .select('user_id, profiles!inner(full_name, avatar_url, email)')
+    .eq('status', 'going')
+    .lt('weekend_date', today)
+
+  if (!plans || plans.length === 0) return null
+
+  // Count visits per user
+  const userCounts: Record<string, { full_name: string | null, avatar_url: string | null, email: string, visit_count: number }> = {}
+
+  plans.forEach((plan: any) => {
+    const profile = plan.profiles
+    if (!userCounts[plan.user_id]) {
+      userCounts[plan.user_id] = {
+        full_name: profile.full_name,
+        avatar_url: profile.avatar_url,
+        email: profile.email,
+        visit_count: 0
+      }
+    }
+    userCounts[plan.user_id].visit_count++
+  })
+
+  // Sort by visit count and take top 5
+  const winners = Object.values(userCounts)
+    .sort((a, b) => b.visit_count - a.visit_count)
+    .slice(0, 5)
+
+  if (winners.length === 0) return null
 
   return (
     <section className="w-full max-w-md space-y-4">
@@ -33,7 +64,7 @@ export default async function HallOfFame() {
               <span className="font-semibold text-sm">{user.full_name || user.email.split('@')[0]}</span>
             </div>
             <span className="px-3 py-1 bg-zinc-50 dark:bg-zinc-800 rounded-full text-[9px] font-black text-zinc-500 uppercase tracking-wider">
-              {user.visit_count} visites
+              {user.visit_count} {user.visit_count === 1 ? 'visita' : 'visites'}
             </span>
           </div>
         ))}

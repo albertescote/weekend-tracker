@@ -13,7 +13,7 @@ interface WeatherDay {
 }
 
 interface WeatherData {
-  summary: WeatherDay | null
+  summary: WeatherDay | null | undefined
   details: (WeatherDay | null)[]
 }
 
