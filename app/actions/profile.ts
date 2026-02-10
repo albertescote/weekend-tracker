@@ -49,13 +49,15 @@ export async function updateProfile(formData: FormData): Promise<ActionResponse>
 export async function getUserStats(userId: string) {
   try {
     const supabase = await createClient()
+    const today = new Date().toISOString().split('T')[0]
 
-    // Count total 'going'
+    // Count total 'going' that have already passed
     const { count, error: countError } = await supabase
       .from('weekend_plans')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('status', 'going')
+      .lt('weekend_date', today)
 
     if (countError) throw countError
 
