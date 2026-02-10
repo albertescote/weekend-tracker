@@ -4,7 +4,7 @@ import { useOptimistic, useTransition } from 'react'
 import { updateStatus } from '@/app/actions/plans'
 import { Check, X, Minus } from 'lucide-react'
 
-type Status = 'going' | 'not_going' | 'pending'
+type Status = 'going' | 'not_going' | 'pending' | null
 
 interface Props {
   userId: string
@@ -20,7 +20,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
     (_, newStatus: Status) => newStatus
   )
 
-  async function handleVote(status: Status) {
+  async function handleVote(status: 'going' | 'not_going' | 'pending') {
     startTransition(async () => {
       setOptimisticStatus(status)
       try {

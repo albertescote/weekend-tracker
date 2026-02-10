@@ -35,7 +35,7 @@ export default async function Home({
 
   const profile = profileResponse.data
   const userPlan = userPlanResponse.data
-  const userStatus: 'going' | 'not_going' | 'pending' = (userPlan?.status as any) || 'pending'
+  const userStatus: 'going' | 'not_going' | 'pending' | null = (userPlan?.status as any) || null
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300 overflow-x-hidden">

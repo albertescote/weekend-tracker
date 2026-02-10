@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# KONNECTA (Weekend Tracker)
 
-## Getting Started
+KONNECTA is a modern Progressive Web App (PWA) designed for groups of friends to coordinate weekend visits to their hometown. It simplifies the "Who's coming home this weekend?" question with a clean, fast, and mobile-first interface.
 
-First, run the development server:
+## 🚀 Tech Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Framework:** [Next.js 16 (App Router)](https://nextjs.org/)
+- **Frontend:** [React 19](https://react.dev/) (with React Compiler enabled), [Tailwind CSS 4](https://tailwindcss.com/)
+- **Backend/Auth:** [Supabase](https://supabase.com/) (PostgreSQL, Row Level Security, SSR)
+- **Notifications:** [OneSignal](https://onesignal.com/) for Web Push Notifications
+- **Deployment:** [Vercel](https://vercel.com/)
+- **Language:** [TypeScript](https://www.typescript.org/)
+
+## ✨ Key Features
+
+- **Authentication:** Secure login via Google OAuth and Magic Links using Supabase Auth.
+- **Weekend Voting:** Users can mark themselves as "Going", "Not Going", or "Pending" for any upcoming weekend.
+- **Activity Board:** Create and join specific plans (e.g., "Dinner on Saturday", "Padel match") associated with a weekend.
+- **Contextual Weather:** Real-time weather forecasts for the selected weekend to help plan activities.
+- **Hall of Fame:** Gamified leaderboards to track who visits most frequently.
+- **Push Notifications:** Stay updated when friends change their status or new plans are created.
+- **PWA Ready:** Installable on iOS and Android for a native-like experience, including pull-to-refresh.
+- **Dark Mode:** Full support for system-based or manual theme switching.
+
+## 📁 Project Structure
+
+- `app/`: Next.js App Router pages and API routes.
+  - `actions/`: Centralized Server Actions for data mutations (plans, activities, profile).
+- `components/`: Modular UI components (Voting, Activity Board, Weather, etc.).
+- `lib/`: Shared logic and client initializations.
+  - `supabase/`: Server and Client-side Supabase configuration.
+- `types/`: Centralized TypeScript interfaces and types.
+- `public/`: Static assets and PWA/OneSignal service workers.
+
+## 🛠️ Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- A Supabase project
+- A OneSignal app (for notifications)
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+
+# OneSignal
+NEXT_PUBLIC_ONESIGNAL_APP_ID=your_onesignal_app_id
+ONESIGNAL_REST_API_KEY=your_onesignal_rest_api_key
+
+# Cron jobs
+CRON_SECRET=your_cron_job_secret
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Clone the repository
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Run the development server:
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Database Schema
 
-## Learn More
+The project expects the following tables in Supabase:
+- `profiles`: User profiles linked to `auth.users`.
+- `weekend_plans`: Stores user status (`going`, `not_going`, `pending`) for specific dates.
+- `activities`: Specific events created within a weekend.
+- `activity_participants`: Join table for users attending specific activities.
 
-To learn more about Next.js, take a look at the following resources:
+Ensure Row Level Security (RLS) is enabled and configured to allow users to read all profiles/plans but only modify their own.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📱 PWA Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+To test PWA features locally, it is recommended to use a tool like `ngrok` or `localtunnel` to serve the app over HTTPS, as service workers and OneSignal require a secure context.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Built with ❤️ for the crew.
