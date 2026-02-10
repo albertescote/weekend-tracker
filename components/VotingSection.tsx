@@ -1,8 +1,8 @@
 'use client'
 
-import { useOptimistic, useTransition, useState } from 'react'
-import { updateStatus } from '@/app/actions/plans'
-import { Check, X, Minus, MessageSquareText } from 'lucide-react'
+import { useOptimistic, useTransition, useState, useEffect } from 'react'
+import { updateStatus, updateComment } from '@/app/actions/plans'
+import { Check, X, Minus, MessageSquareText, Save } from 'lucide-react'
 
 type Status = 'going' | 'not_going' | 'pending' | null
 
@@ -23,11 +23,28 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
     (_, newStatus: Status) => newStatus
   )
 
+  const hasCommentChanged = comment !== (initialComment || '')
+
+  useEffect(() => {
+    setComment(initialComment || '')
+    setShowComment(!!initialComment)
+  }, [initialComment, weekendDate])
+
   async function handleVote(status: 'going' | 'not_going' | 'pending') {
     startTransition(async () => {
       setOptimisticStatus(status)
       try {
         await updateStatus(userId, weekendDate, status, comment)
+      } catch (error) {
+        console.error(error)
+      }
+    })
+  }
+
+  async function handleSaveComment() {
+    startTransition(async () => {
+      try {
+        await updateComment(userId, weekendDate, comment)
       } catch (error) {
         console.error(error)
       }
@@ -94,17 +111,29 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
             Afegir comentari
           </button>
         ) : (
-          <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-300">
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Ex: Tinc un sopar dissabte..."
-              className="w-full p-3 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
-              maxLength={280}
-            />
-            {optimisticStatus && (
-              <p className="text-[9px] text-zinc-400 text-center italic">
-                Es guardarà quan tornis a votar
+          <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-300">
+            <div className="relative">
+              <textarea
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                placeholder="Ex: Tinc un sopar dissabte..."
+                className="w-full p-3 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
+                maxLength={280}
+              />
+              {hasCommentChanged && (
+                <button
+                  onClick={handleSaveComment}
+                  disabled={isPending}
+                  className="absolute bottom-2 right-2 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+                  title="Guardar comentari"
+                >
+                  <Save size={16} />
+                </button>
+              )}
+            </div>
+            {hasCommentChanged && (
+              <p className="text-[9px] text-blue-500 font-bold text-center uppercase tracking-wider animate-pulse">
+                Comentari pendent de guardar
               </p>
             )}
           </div>

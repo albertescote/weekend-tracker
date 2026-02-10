@@ -15,6 +15,41 @@ const UpdateStatusSchema = z.object({
   comment: z.string().max(280).optional().nullable(),
 })
 
+const UpdateCommentSchema = z.object({
+  userId: z.string().uuid(),
+  weekendDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  comment: z.string().max(280).optional().nullable(),
+})
+
+export async function updateComment(
+  userId: string,
+  weekendDate: string,
+  comment: string | null
+): Promise<ActionResponse> {
+  try {
+    const validatedData = UpdateCommentSchema.safeParse({ userId, weekendDate, comment })
+    if (!validatedData.success) {
+      return { success: false, error: 'Dades invàlides' }
+    }
+
+    const supabase = await createClient()
+
+    const { error } = await supabase
+      .from('weekend_plans')
+      .update({ comment, updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .eq('weekend_date', weekendDate)
+
+    if (error) throw error
+
+    revalidatePath('/')
+    return { success: true }
+  } catch (e) {
+    console.error('Error updating comment:', e)
+    return { success: false, error: 'No s\'ha pogut actualitzar el comentari' }
+  }
+}
+
 export async function updateStatus(
   userId: string,
   weekendDate: string,
