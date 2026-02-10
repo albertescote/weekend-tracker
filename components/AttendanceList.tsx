@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import UserAttendanceCard from './UserAttendanceCard'
 
 interface Props {
   weekendDate: string
@@ -59,23 +60,7 @@ function Section({ title, users, color, opacity }: { title: string; users: any[]
       </h3>
       <div className="grid gap-2">
         {users.map((plan, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-3 p-3 bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-100 dark:border-zinc-800 shadow-sm"
-          >
-            <div className="w-10 h-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center overflow-hidden border border-zinc-100 dark:border-zinc-700">
-              {plan.profiles.avatar_url ? (
-                <img src={plan.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-zinc-500 font-bold uppercase">
-                  {(plan.profiles.full_name || plan.profiles.email)[0]}
-                </span>
-              )}
-            </div>
-            <span className="font-semibold text-sm">
-              {plan.profiles.full_name || plan.profiles.email.split('@')[0]}
-            </span>
-          </div>
+          <UserAttendanceCard key={i} profile={plan.profiles} />
         ))}
       </div>
     </div>

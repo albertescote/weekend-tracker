@@ -45,3 +45,40 @@ export async function updateProfile(formData: FormData): Promise<ActionResponse>
     return { success: false, error: 'No s\'ha pogut actualitzar el perfil' }
   }
 }
+
+export async function getUserStats(userId: string) {
+  try {
+    const supabase = await createClient()
+
+    // Count total 'going'
+    const { count, error: countError } = await supabase
+      .from('weekend_plans')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'going')
+
+    if (countError) throw countError
+
+    // Get next 5 weekends
+    const { data: upcomingPlans, error: upcomingError } = await supabase
+      .from('weekend_plans')
+      .select('weekend_date, status')
+      .eq('user_id', userId)
+      .gte('weekend_date', new Date().toISOString().split('T')[0])
+      .order('weekend_date', { ascending: true })
+      .limit(5)
+
+    if (upcomingError) throw upcomingError
+
+    return {
+      success: true,
+      data: {
+        totalVisits: count || 0,
+        upcomingPlans: upcomingPlans || []
+      }
+    }
+  } catch (e) {
+    console.error('Error fetching user stats:', e)
+    return { success: false, error: 'No s\'han pogut carregar les estadístiques' }
+  }
+}
