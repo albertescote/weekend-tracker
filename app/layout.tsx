@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "WEEKEND",
+  title: "KONNECTA",
   description: "Organitza el cap de setmana amb els teus amics",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "WEEKEND",
+    title: "KONNECTA",
   },
   icons: {
     apple: "/icon.svg",

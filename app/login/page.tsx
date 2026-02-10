@@ -29,7 +29,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background text-foreground">
       <div className="w-full max-w-sm space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 text-center">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold tracking-tight">Weekend Tracker</h1>
+          <h1 className="text-2xl font-bold tracking-tight">KONNECTA</h1>
           <p className="text-zinc-500">Inicia sessió per organitzar el cap de setmana amb els teus amics</p>
         </div>
 

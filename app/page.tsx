@@ -46,7 +46,7 @@ export default async function Home({
         <header className="flex items-start justify-between w-full max-w-md mx-auto text-zinc-950 dark:text-white">
           <div className="flex flex-col">
             <h1 className="text-3xl font-black tracking-tighter leading-[0.85] text-zinc-950 dark:text-white flex flex-col">
-              <span>WEEKEND</span>
+              <span>KONNECTA</span>
             </h1>
             <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-3">{displayDate}</p>
           </div>
@@ -128,7 +128,7 @@ export default async function Home({
       </div>
 
       <footer className="mt-auto py-12 text-zinc-400 text-[10px] font-bold uppercase tracking-widest text-center">
-        Weekend Tracker v1.0
+        KONNECTA v1.0
       </footer>
     </main>
   )

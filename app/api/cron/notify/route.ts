@@ -41,13 +41,13 @@ export async function GET(request: Request) {
     body: JSON.stringify({
       app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
       include_player_ids: playerIds,
-      contents: { 
+      contents: {
         en: "Vens a Valls aquest cap de setmana? 🏡 Actualitza el teu estat ara!",
-        ca: "Vens a Valls aquest cap de setmana? 🏡 Actualitza el teu estat ara!" 
+        ca: "Vens a Valls aquest cap de setmana? 🏡 Actualitza el teu estat ara!"
       },
-      headings: { 
-        en: "WEEKEND 🏡",
-        ca: "WEEKEND 🏡"
+      headings: {
+        en: "KONNECTA 🏡",
+        ca: "KONNECTA 🏡"
       },
       url: `https://weekend-tracker-five.vercel.app?date=${dateStr}`
     })
