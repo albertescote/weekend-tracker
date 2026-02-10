@@ -44,7 +44,12 @@ export async function getWeekendWeather(fridayDateStr: string) {
   const lat = HOMETOWN_COORDINATES.lat;
   const lng = HOMETOWN_COORDINATES.lng;
 
-  const saturdayDateStr = format(addDays(new Date(fridayDateStr), 1), 'yyyy-MM-dd');
+  const friday = new Date(fridayDateStr);
+  const dates = [
+    fridayDateStr,
+    format(addDays(friday, 1), 'yyyy-MM-dd'),
+    format(addDays(friday, 2), 'yyyy-MM-dd')
+  ];
 
   try {
     const res = await fetch(
@@ -52,14 +57,26 @@ export async function getWeekendWeather(fridayDateStr: string) {
       { next: { revalidate: 3600 } }
     );
     const data = await res.json();
-    const dayIndex = data.daily.time.indexOf(saturdayDateStr);
+    
+    const weekendForecast = dates.map(date => {
+      const dayIndex = data.daily.time.indexOf(date);
+      if (dayIndex === -1) return null;
+      return {
+        date,
+        maxTemp: Math.round(data.daily.temperature_2m_max[dayIndex]),
+        minTemp: Math.round(data.daily.temperature_2m_min[dayIndex]),
+        code: data.daily.weather_code[dayIndex]
+      };
+    });
 
-    if (dayIndex === -1) return null;
+    if (weekendForecast.every(day => day === null)) return null;
+
+    // For the summary (the card), we use Saturday's weather if available, or the first available day
+    const summary = weekendForecast[1] || weekendForecast.find(d => d !== null);
 
     return {
-      maxTemp: Math.round(data.daily.temperature_2m_max[dayIndex]),
-      minTemp: Math.round(data.daily.temperature_2m_min[dayIndex]),
-      code: data.daily.weather_code[dayIndex]
+      summary,
+      details: weekendForecast
     };
   } catch (e) {
     return null;
