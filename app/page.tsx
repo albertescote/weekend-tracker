@@ -9,7 +9,6 @@ import ThemeToggle from '@/components/ThemeToggle'
 import ActivityBoard from '@/components/ActivityBoard'
 import ProfileButton from '@/components/ProfileButton'
 import PullToRefresh from '@/components/PullToRefresh'
-import NotAuthorized from '@/components/NotAuthorized'
 import { format, parseISO, addDays } from 'date-fns'
 import { Suspense } from 'react'
 
@@ -20,22 +19,6 @@ export default async function Home({
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-
-  // Whitelist Check
-  let isWhitelisted = false
-  if (user?.email) {
-    const { data: whitelistEntry } = await supabase
-      .from('whitelist')
-      .select('email')
-      .eq('email', user.email)
-      .single()
-    
-    if (whitelistEntry) isWhitelisted = true
-  }
-
-  if (user && !isWhitelisted) {
-    return <NotAuthorized email={user.email!} />
-  }
 
   const params = await searchParams
   const selectedDateStr = (params.date as string) || formatDbDate(getUpcomingFriday())
