@@ -78,14 +78,7 @@ export default function WeatherModal({ forecast, onClose }: Props) {
             })}
           </div>
 
-          <div className="p-6 pt-0">
-            <button
-              onClick={onClose}
-              className="w-full py-4 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 rounded-2xl font-black shadow-xl active:scale-95 transition-all"
-            >
-              ENTÈS
-            </button>
-          </div>
+          <div className="p-6 pt-0 invisible h-0" />
         </div>
       </div>
     </Portal>

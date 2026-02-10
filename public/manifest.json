@@ -1,7 +1,7 @@
 {
-  "name": "Weekend Tracker",
-  "short_name": "Weekend Tracker",
-  "description": "Track who's going home for the weekend",
+  "name": "Konnecta",
+  "short_name": "Konnecta",
+  "description": "Segueix qui estarà a casa el cap de setmana",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
