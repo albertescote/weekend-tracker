@@ -12,15 +12,17 @@ const UpdateStatusSchema = z.object({
   userId: z.string().uuid(),
   weekendDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   status: z.enum(['going', 'not_going', 'pending']),
+  comment: z.string().max(280).optional().nullable(),
 })
 
 export async function updateStatus(
   userId: string,
   weekendDate: string,
-  status: 'going' | 'not_going' | 'pending'
+  status: 'going' | 'not_going' | 'pending',
+  comment?: string | null
 ): Promise<ActionResponse> {
   try {
-    const validatedData = UpdateStatusSchema.safeParse({ userId, weekendDate, status })
+    const validatedData = UpdateStatusSchema.safeParse({ userId, weekendDate, status, comment })
     if (!validatedData.success) {
       return { success: false, error: 'Dades invàlides' }
     }
@@ -36,7 +38,13 @@ export async function updateStatus(
     const { error } = await supabase
       .from('weekend_plans')
       .upsert(
-        { user_id: userId, weekend_date: weekendDate, status, updated_at: new Date().toISOString() },
+        { 
+          user_id: userId, 
+          weekend_date: weekendDate, 
+          status, 
+          comment,
+          updated_at: new Date().toISOString() 
+        },
         { onConflict: 'user_id, weekend_date' }
       )
 

@@ -14,6 +14,7 @@ export default async function AttendanceList({ weekendDate }: Props) {
       .select(`
         user_id,
         status,
+        comment,
         profiles (
           id,
           full_name,
@@ -60,7 +61,7 @@ function Section({ title, users, color, opacity }: { title: string; users: any[]
       </h3>
       <div className="grid gap-2">
         {users.map((plan, i) => (
-          <UserAttendanceCard key={i} profile={plan.profiles} />
+          <UserAttendanceCard key={i} profile={plan.profiles} comment={plan.comment} />
         ))}
       </div>
     </div>

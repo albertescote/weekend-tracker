@@ -30,12 +30,13 @@ export default async function Home({
 
   const [profileResponse, userPlanResponse] = user ? await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
-    supabase.from('weekend_plans').select('status').eq('user_id', user.id).eq('weekend_date', selectedDateStr).single()
+    supabase.from('weekend_plans').select('status, comment').eq('user_id', user.id).eq('weekend_date', selectedDateStr).single()
   ]) : [{ data: null }, { data: null }]
 
   const profile = profileResponse.data
   const userPlan = userPlanResponse.data
   const userStatus: 'going' | 'not_going' | 'pending' | null = (userPlan?.status as any) || null
+  const userComment = userPlan?.comment || null
 
   return (
     <main className="min-h-screen bg-background text-foreground flex flex-col items-center transition-colors duration-300 overflow-x-hidden">
@@ -88,6 +89,7 @@ export default async function Home({
                 userId={user.id}
                 weekendDate={selectedDateStr}
                 initialStatus={userStatus}
+                initialComment={userComment}
                 displayDate={displayDate}
               />
             </div>

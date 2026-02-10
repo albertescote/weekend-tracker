@@ -1,8 +1,8 @@
 'use client'
 
-import { useOptimistic, useTransition } from 'react'
+import { useOptimistic, useTransition, useState } from 'react'
 import { updateStatus } from '@/app/actions/plans'
-import { Check, X, Minus } from 'lucide-react'
+import { Check, X, Minus, MessageSquareText } from 'lucide-react'
 
 type Status = 'going' | 'not_going' | 'pending' | null
 
@@ -10,11 +10,14 @@ interface Props {
   userId: string
   weekendDate: string
   initialStatus: Status
+  initialComment?: string | null
   displayDate: string
 }
 
-export default function VotingSection({ userId, weekendDate, initialStatus, displayDate }: Props) {
+export default function VotingSection({ userId, weekendDate, initialStatus, initialComment, displayDate }: Props) {
   const [isPending, startTransition] = useTransition()
+  const [comment, setComment] = useState(initialComment || '')
+  const [showComment, setShowComment] = useState(!!initialComment)
   const [optimisticStatus, setOptimisticStatus] = useOptimistic(
     initialStatus,
     (_, newStatus: Status) => newStatus
@@ -24,7 +27,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
     startTransition(async () => {
       setOptimisticStatus(status)
       try {
-        await updateStatus(userId, weekendDate, status)
+        await updateStatus(userId, weekendDate, status, comment)
       } catch (error) {
         console.error(error)
       }
@@ -32,7 +35,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
   }
 
   return (
-    <div className="flex flex-col items-center gap-2 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800">
+    <div className="flex flex-col items-center gap-4 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800">
       <div className="text-center space-y-0.5">
         <h2 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">Hi seràs?</h2>
         <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 dark:text-blue-400">
@@ -40,7 +43,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
         </p>
       </div>
       
-      <div className="flex gap-4 mt-1">
+      <div className="flex gap-4">
         <button
           onClick={() => handleVote('going')}
           disabled={isPending}
@@ -51,7 +54,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
           }`}
         >
           <Check size={32} />
-          <span className="block text-xs mt-1 font-medium">Sí</span>
+          <span className="block text-xs mt-1 font-medium text-center">Sí</span>
         </button>
 
         <button
@@ -64,7 +67,7 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
           }`}
         >
           <X size={32} />
-          <span className="block text-xs mt-1 font-medium">No</span>
+          <span className="block text-xs mt-1 font-medium text-center">No</span>
         </button>
 
         <button
@@ -77,8 +80,35 @@ export default function VotingSection({ userId, weekendDate, initialStatus, disp
           }`}
         >
           <Minus size={32} />
-          <span className="block text-xs mt-1 font-medium">Potser</span>
+          <span className="block text-xs mt-1 font-medium text-center">Potser</span>
         </button>
+      </div>
+
+      <div className="w-full">
+        {!showComment && !initialComment ? (
+          <button
+            onClick={() => setShowComment(true)}
+            className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors mx-auto"
+          >
+            <MessageSquareText size={14} />
+            Afegir comentari
+          </button>
+        ) : (
+          <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-300">
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Ex: Tinc un sopar dissabte..."
+              className="w-full p-3 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
+              maxLength={280}
+            />
+            {optimisticStatus && (
+              <p className="text-[9px] text-zinc-400 text-center italic">
+                Es guardarà quan tornis a votar
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )

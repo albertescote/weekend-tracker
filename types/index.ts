@@ -33,5 +33,6 @@ export type WeekendPlan = {
   user_id: string
   weekend_date: string
   status: 'going' | 'not_going' | 'pending'
+  comment?: string | null
   updated_at: string
 }
