@@ -2,7 +2,7 @@
 
 import { useOptimistic, useTransition, useState, useEffect } from 'react'
 import { updateStatus, updateComment } from '@/app/actions/plans'
-import { Check, X, Minus, MessageSquareText, Save } from 'lucide-react'
+import { Check, X, Minus, MessageSquareText, SendHorizontal } from 'lucide-react'
 
 type Status = 'going' | 'not_going' | 'pending' | null
 
@@ -112,22 +112,22 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
           </button>
         ) : (
           <div className="space-y-3 animate-in fade-in slide-in-from-top-1 duration-300">
-            <div className="relative">
+            <div className="relative flex items-center">
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Ex: Tinc un sopar dissabte..."
-                className="w-full p-3 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
+                className="w-full p-3 pr-12 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
                 maxLength={280}
               />
               {hasCommentChanged && (
                 <button
                   onClick={handleSaveComment}
                   disabled={isPending}
-                  className="absolute bottom-2 right-2 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+                  className="absolute right-2 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50"
                   title="Guardar comentari"
                 >
-                  <Save size={16} />
+                  <SendHorizontal size={16} />
                 </button>
               )}
             </div>
