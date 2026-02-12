@@ -111,6 +111,19 @@ export async function updateActivity(
     const { id, title, start_time, day_of_week, description } =
       validatedData.data;
 
+    console.log("Diagnostic: Checking activity before update:", { id, attemptingUserId: user.id });
+    const { data: currentActivity, error: fetchError } = await supabase
+      .from("activities")
+      .select("id, creator_id")
+      .eq("id", id)
+      .single();
+    
+    if (fetchError) {
+      console.error("Diagnostic: Fetch error:", fetchError);
+    } else {
+      console.log("Diagnostic: Current activity in DB:", currentActivity);
+    }
+
     console.log("Updating activity:", { id, userId: user.id });
 
     const { data, error, status } = await supabase
