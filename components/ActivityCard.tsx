@@ -7,6 +7,7 @@ import {
 import { Users, Clock, UserPlus } from "lucide-react";
 import { Activity } from "@/types";
 import ActivityDetailsModal from "./ActivityDetailsModal";
+import { addDays, parseISO, format } from "date-fns";
 
 export default function ActivityCard({
   activity,
@@ -93,6 +94,13 @@ export default function ActivityCard({
     diumenge: "Diu",
   };
 
+  // Calculate day of the month
+  const anchorDate = parseISO(activity.weekend_date);
+  let eventDate = anchorDate;
+  if (activity.day_of_week === "dissabte") eventDate = addDays(anchorDate, 1);
+  if (activity.day_of_week === "diumenge") eventDate = addDays(anchorDate, 2);
+  const dayOfMonth = format(eventDate, "d");
+
   return (
     <>
       <div
@@ -103,7 +111,7 @@ export default function ActivityCard({
           <div className="space-y-1.5 flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[10px] font-black px-2 py-1 rounded-lg uppercase tracking-wider">
-                {dayLabels[activity.day_of_week]}
+                {dayLabels[activity.day_of_week]} {dayOfMonth}
               </span>
               <h4 className="font-bold text-lg leading-tight text-zinc-950 dark:text-white">
                 {activity.title}

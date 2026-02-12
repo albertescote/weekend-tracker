@@ -5,6 +5,7 @@ import Portal from "./Portal";
 import { Activity, ActivityParticipant } from "@/types";
 import { useState, useTransition } from "react";
 import { updateActivity, deleteActivity } from "@/app/actions/activities";
+import { addDays, parseISO, format } from "date-fns";
 
 interface Props {
   activity: Activity;
@@ -50,6 +51,13 @@ export default function ActivityDetailsModal({
     dissabte: "Dissabte",
     diumenge: "Diumenge",
   };
+
+  // Calculate day of the month
+  const anchorDate = parseISO(activity.weekend_date);
+  let eventDate = anchorDate;
+  if (activity.day_of_week === "dissabte") eventDate = addDays(anchorDate, 1);
+  if (activity.day_of_week === "diumenge") eventDate = addDays(anchorDate, 2);
+  const dayOfMonth = format(eventDate, "d");
 
   const startEditing = () => {
     setEditForm({
@@ -166,7 +174,7 @@ export default function ActivityDetailsModal({
               ) : (
                 <>
                   <span className="inline-block bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
-                    {dayLabels[activity.day_of_week]}
+                    {dayLabels[activity.day_of_week]} {dayOfMonth}
                   </span>
                   <h3 className="text-2xl font-black text-zinc-950 dark:text-white px-6 leading-tight">
                     {activity.title}
