@@ -56,6 +56,9 @@ ONESIGNAL_REST_API_KEY=your_onesignal_rest_api_key
 
 # Cron jobs
 CRON_SECRET=your_cron_job_secret
+
+# Testing
+SILENT_NOTIFICATIONS=false
 ```
 
 ### Installation

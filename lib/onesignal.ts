@@ -5,29 +5,42 @@ export async function sendPushNotification({
   contents,
   date,
   excludedUserId,
+  playerIds: manualPlayerIds,
 }: {
   headings: string;
   contents: string;
   date: string;
   excludedUserId?: string;
+  playerIds?: string[];
 }) {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  if (process.env.SILENT_NOTIFICATIONS === "true") {
+    console.log("Notifications are silenced (SILENT_NOTIFICATIONS=true)");
+    return;
+  }
 
-  const { data: profiles } = await supabase
-    .from("profiles")
-    .select("onesignal_id")
-    .not("onesignal_id", "is", null)
-    .not("id", "eq", excludedUserId || "");
+  let playerIds = manualPlayerIds;
 
-  if (!profiles || profiles.length === 0) return;
+  if (!playerIds) {
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    );
 
-  const playerIds = profiles.map((p) => p.onesignal_id);
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("onesignal_id")
+      .not("onesignal_id", "is", null)
+      .not("id", "eq", excludedUserId || "");
+
+    if (!profiles || profiles.length === 0) return;
+
+    playerIds = profiles.map((p) => p.onesignal_id);
+  }
+
+  if (!playerIds || playerIds.length === 0) return;
 
   try {
-    await fetch("https://onesignal.com/api/v1/notifications", {
+    const response = await fetch("https://onesignal.com/api/v1/notifications", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,6 +54,7 @@ export async function sendPushNotification({
         url: `https://weekend-tracker-five.vercel.app?date=${date}`,
       }),
     });
+    return await response.json();
   } catch (e) {
     console.error("Error enviant notificació:", e);
   }

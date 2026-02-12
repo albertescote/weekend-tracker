@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getUpcomingFriday, formatDbDate } from "@/lib/utils";
+import { sendPushNotification } from "@/lib/onesignal";
 
 // This would be called by a Vercel Cron Job
 // https://vercel.com/docs/cron-jobs
@@ -43,35 +44,19 @@ export async function GET(request: Request) {
       const status = planMap.get(p.id);
       return !status || status === "pending";
     })
-    .map((p) => p.onesignal_id);
+    .map((p) => p.onesignal_id as string);
 
   if (playerIds.length === 0) {
     return NextResponse.json({ message: "Everyone has already confirmed" });
   }
 
-  // 4. Send OneSignal Notification
-  const response = await fetch("https://onesignal.com/api/v1/notifications", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Basic ${process.env.ONESIGNAL_REST_API_KEY}`,
-    },
-    body: JSON.stringify({
-      app_id: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID,
-      include_player_ids: playerIds,
-      contents: {
-        en: "Vens a Valls aquest cap de setmana? Actualitza el teu estat ara!",
-        ca: "Vens a Valls aquest cap de setmana? Actualitza el teu estat ara!",
-      },
-      headings: {
-        en: "KONNECTA 🏡",
-        ca: "KONNECTA 🏡",
-      },
-      url: `https://weekend-tracker-five.vercel.app?date=${dateStr}`,
-    }),
+  // 4. Send OneSignal Notification using centralized function
+  const result = await sendPushNotification({
+    playerIds,
+    headings: "KONNECTA 🏡",
+    contents: "Vens a Valls aquest cap de setmana? Actualitza el teu estat ara!",
+    date: dateStr,
   });
-
-  const result = await response.json();
 
   return NextResponse.json({ result, notifiedCount: playerIds.length });
 }
