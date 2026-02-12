@@ -33,9 +33,17 @@ export default async function HallOfFame() {
         full_name: string | null;
         avatar_url: string | null;
         email: string;
-      };
+      } | {
+        full_name: string | null;
+        avatar_url: string | null;
+        email: string;
+      }[];
     }) => {
-      const profile = plan.profiles;
+      // Supabase join can return an object or an array of objects depending on the schema/query
+      const profile = Array.isArray(plan.profiles) ? plan.profiles[0] : plan.profiles;
+      
+      if (!profile) return;
+
       if (!userCounts[plan.user_id]) {
         userCounts[plan.user_id] = {
           full_name: profile.full_name,

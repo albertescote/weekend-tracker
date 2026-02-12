@@ -106,17 +106,16 @@ export default function UserSummaryModal({ profile, onClose }: Props) {
                   />
                 ) : (
                   <p className="text-sm font-black text-zinc-950 dark:text-white">
-                    {stats?.upcomingPlans.find((p) => p.status === "going")
-                      ? format(
-                          parseISO(
-                            stats.upcomingPlans.find(
-                              (p) => p.status === "going",
-                            ).weekend_date,
-                          ),
-                          "d MMM",
-                          { locale: ca },
-                        )
-                      : "N/D"}
+                    {(() => {
+                      const nextGoingPlan = stats?.upcomingPlans.find(
+                        (p) => p.status === "going",
+                      );
+                      return nextGoingPlan
+                        ? format(parseISO(nextGoingPlan.weekend_date), "d MMM", {
+                            locale: ca,
+                          })
+                        : "N/D";
+                    })()}
                   </p>
                 )}
               </div>

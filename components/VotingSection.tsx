@@ -1,13 +1,13 @@
 "use client";
 
-import { useOptimistic, useTransition, useState, useEffect } from "react";
-import { updateStatus, updateComment } from "@/app/actions/plans";
+import { useEffect, useOptimistic, useState, useTransition } from "react";
+import { updateComment, updateStatus } from "@/app/actions/plans";
 import {
   Check,
-  X,
-  Minus,
   MessageSquareText,
+  Minus,
   SendHorizontal,
+  X,
 } from "lucide-react";
 
 type Status = "going" | "not_going" | "pending" | null;
@@ -40,7 +40,6 @@ export default function VotingSection({
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setComment(initialComment || "");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowComment(!!initialComment);
   }, [initialComment, weekendDate]);
 
