@@ -45,8 +45,8 @@ export default function ActivityDetailsModal({
             >
               <X size={20} />
             </button>
-            <div className="text-center space-y-4">
-              <span className="bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <span className="inline-block bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                 {dayLabels[activity.day_of_week]}
               </span>
               <h3 className="text-2xl font-black text-zinc-950 dark:text-white px-6 leading-tight">
