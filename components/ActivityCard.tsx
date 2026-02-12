@@ -3,9 +3,8 @@
 import { useOptimistic, useTransition, useState } from "react";
 import {
   updateActivityParticipation,
-  deleteActivity,
 } from "@/app/actions/activities";
-import { Users, Clock, Trash2, UserPlus } from "lucide-react";
+import { Users, Clock, UserPlus } from "lucide-react";
 import { Activity } from "@/types";
 import ActivityDetailsModal from "./ActivityDetailsModal";
 
@@ -23,7 +22,6 @@ export default function ActivityCard({
     (p) => p.user_id === currentUserId,
   );
   const isJoined = !!userParticipation;
-  const isCreator = activity.creator_id === currentUserId;
 
   const [optimisticParticipants, setOptimisticParticipants] = useOptimistic(
     participants,
@@ -84,14 +82,6 @@ export default function ActivityCard({
     });
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm("Segur que vols esborrar aquest pla?")) return;
-    startTransition(async () => {
-      await deleteActivity(activity.id);
-    });
-  };
-
   const totalAttendance = optimisticParticipants.reduce(
     (acc, p) => acc + 1 + (p.additional_participants || 0),
     0,
@@ -125,15 +115,6 @@ export default function ActivityCard({
               </p>
             )}
           </div>
-          {isCreator && (
-            <button
-              onClick={handleDelete}
-              className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-red-500 transition-all rounded-lg active:scale-90 shrink-0"
-              aria-label="Esborra el pla"
-            >
-              <Trash2 size={16} />
-            </button>
-          )}
         </div>
 
         <div className="flex gap-2">
@@ -236,6 +217,7 @@ export default function ActivityCard({
           hasPlusOne={hasPlusOne}
           isPending={isPending}
           totalAttendance={totalAttendance}
+          currentUserId={currentUserId}
         />
       )}
     </>

@@ -77,6 +77,61 @@ export async function createActivity(
   }
 }
 
+const UpdateActivitySchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1, "El títol és obligatori"),
+  start_time: z.string().optional().nullable(),
+  day_of_week: z.enum(["divendres", "dissabte", "diumenge"]),
+  description: z.string().optional().nullable(),
+});
+
+export async function updateActivity(
+  formData: FormData,
+): Promise<ActionResponse> {
+  try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return { success: false, error: "Sessió no iniciada" };
+
+    const rawData = {
+      id: formData.get("id"),
+      title: formData.get("title"),
+      start_time: formData.get("start_time"),
+      day_of_week: formData.get("day_of_week"),
+      description: formData.get("description"),
+    };
+
+    const validatedData = UpdateActivitySchema.safeParse(rawData);
+    if (!validatedData.success) {
+      return { success: false, error: validatedData.error.issues[0].message };
+    }
+
+    const { id, title, start_time, day_of_week, description } =
+      validatedData.data;
+
+    const { error } = await supabase
+      .from("activities")
+      .update({
+        title,
+        start_time,
+        day_of_week,
+        description,
+      })
+      .eq("id", id)
+      .eq("creator_id", user.id);
+
+    if (error) throw error;
+
+    revalidatePath("/");
+    return { success: true };
+  } catch (e) {
+    console.error("Error updating activity:", e);
+    return { success: false, error: "No s'ha pogut actualitzar el pla" };
+  }
+}
+
 export async function deleteActivity(
   activityId: string,
 ): Promise<ActionResponse> {
