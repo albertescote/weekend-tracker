@@ -111,9 +111,13 @@ export default function UserSummaryModal({ profile, onClose }: Props) {
                         (p) => p.status === "going",
                       );
                       return nextGoingPlan
-                        ? format(parseISO(nextGoingPlan.weekend_date), "d MMM", {
-                            locale: ca,
-                          })
+                        ? format(
+                            parseISO(nextGoingPlan.weekend_date),
+                            "d MMM",
+                            {
+                              locale: ca,
+                            },
+                          )
                         : "N/D";
                     })()}
                   </p>

@@ -47,16 +47,14 @@ export async function createActivity(
       .eq("id", user.id)
       .single();
 
-    const { error } = await supabase
-      .from("activities")
-      .insert({
-        title,
-        weekend_date,
-        creator_id: user.id,
-        start_time,
-        day_of_week,
-        description,
-      });
+    const { error } = await supabase.from("activities").insert({
+      title,
+      weekend_date,
+      creator_id: user.id,
+      start_time,
+      day_of_week,
+      description,
+    });
 
     if (error) throw error;
 

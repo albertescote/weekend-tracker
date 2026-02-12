@@ -45,7 +45,8 @@ export default async function Home({
 
   const profile = profileResponse.data;
   const userPlan = userPlanResponse.data;
-  const userStatus = (userPlan?.status as "going" | "not_going" | "pending" | null) || null;
+  const userStatus =
+    (userPlan?.status as "going" | "not_going" | "pending" | null) || null;
   const userComment = userPlan?.comment || null;
 
   return (

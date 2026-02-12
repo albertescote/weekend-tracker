@@ -33,17 +33,17 @@ export default async function AttendanceList({ weekendDate }: Props) {
   const plans = plansResponse.data || [];
   const allProfiles = profilesResponse.data || [];
 
-  const going = (plans.filter((p) => p.status === "going") as unknown) as {
+  const going = plans.filter((p) => p.status === "going") as unknown as {
     profiles: Profile;
     comment?: string | null;
     status: string;
   }[];
-  const notGoing = (plans.filter((p) => p.status === "not_going") as unknown) as {
+  const notGoing = plans.filter((p) => p.status === "not_going") as unknown as {
     profiles: Profile;
     comment?: string | null;
     status: string;
   }[];
-  const pending = (plans.filter((p) => p.status === "pending") as unknown) as {
+  const pending = plans.filter((p) => p.status === "pending") as unknown as {
     profiles: Profile;
     comment?: string | null;
     status: string;

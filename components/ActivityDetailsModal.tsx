@@ -89,9 +89,10 @@ export default function ActivityDetailsModal({
 
             {/* Participants List */}
             <div className="space-y-4">
-                          <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] px-1">
-                            Qui s&apos;ha apuntat?
-                          </h4>              <div className="grid grid-cols-1 gap-3">
+              <h4 className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] px-1">
+                Qui s&apos;ha apuntat?
+              </h4>{" "}
+              <div className="grid grid-cols-1 gap-3">
                 {participants.length > 0 ? (
                   participants.map((p, i) => (
                     <div
