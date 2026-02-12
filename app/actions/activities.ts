@@ -111,6 +111,8 @@ export async function updateActivity(
     const { id, title, start_time, day_of_week, description } =
       validatedData.data;
 
+    console.log("Updating activity:", { id, userId: user.id });
+
     const { error } = await supabase
       .from("activities")
       .update({
@@ -122,7 +124,10 @@ export async function updateActivity(
       .eq("id", id)
       .eq("creator_id", user.id);
 
-    if (error) throw error;
+    if (error) {
+      console.error("Supabase update error:", error);
+      throw error;
+    }
 
     revalidatePath("/");
     return { success: true };

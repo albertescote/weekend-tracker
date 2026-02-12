@@ -48,6 +48,16 @@ export default function ActivityDetailsModal({
     diumenge: "Diumenge",
   };
 
+  const startEditing = () => {
+    setEditForm({
+      title: activity.title,
+      description: activity.description || "",
+      day_of_week: activity.day_of_week,
+      start_time: activity.start_time || "",
+    });
+    setIsEditing(true);
+  };
+
   const handleSave = async () => {
     startTransition(async () => {
       const formData = new FormData();
@@ -90,7 +100,7 @@ export default function ActivityDetailsModal({
               {isCreator && !isEditing && (
                 <>
                   <button
-                    onClick={() => setIsEditing(true)}
+                    onClick={startEditing}
                     className="p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-zinc-900 dark:text-white rounded-full transition-colors z-10"
                     title="Editar pla"
                   >
