@@ -1,11 +1,11 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
-import { revalidatePath } from 'next/cache'
-import { sendPushNotification } from '@/lib/onesignal'
+import {createClient} from '@/lib/supabase/server'
+import {revalidatePath} from 'next/cache'
+import {sendPushNotification} from '@/lib/onesignal'
 import {getFormattedDayText, isUpcomingWeekend} from '@/lib/utils'
-import { z } from 'zod'
-import { ActionResponse } from '@/types'
+import {z} from 'zod'
+import {ActionResponse} from '@/types'
 
 const CreateActivitySchema = z.object({
   title: z.string().min(1, 'El títol és obligatori'),
@@ -80,14 +80,28 @@ export async function deleteActivity(activityId: string): Promise<ActionResponse
   }
 }
 
-export async function toggleActivityParticipation(activityId: string, isJoining: boolean): Promise<ActionResponse> {
+export async function updateActivityParticipation(
+  activityId: string,
+  isJoining: boolean,
+  additionalParticipants: number = 0
+): Promise<ActionResponse> {
   try {
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { success: false, error: 'Sessió no iniciada' }
 
     if (isJoining) {
-      const { error } = await supabase.from('activity_participants').insert({ activity_id: activityId, user_id: user.id })
+      const { error } = await supabase
+        .from('activity_participants')
+        .upsert(
+          {
+            activity_id: activityId,
+            user_id: user.id,
+            additional_participants: additionalParticipants
+          },
+          { onConflict: 'activity_id, user_id' }
+        )
+
       if (error) throw error
 
       const [activityRes, profileRes] = await Promise.all([
@@ -101,9 +115,11 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
         const dayText = getFormattedDayText(weekend_date, day_of_week)
         const isUpcoming = isUpcomingWeekend(weekend_date)
 
+        const guestText = additionalParticipants > 0 ? ` (+${additionalParticipants})` : ''
+
         sendPushNotification({
           headings: 'Això s\'anima!🚀',
-          contents: `${name} s'ha apuntat al pla "${title}" ${isUpcoming ? 'per' : 'pel'} ${dayText}.`,
+          contents: `${name}${guestText} s'ha apuntat al pla "${title}" ${isUpcoming ? 'per' : 'pel'} ${dayText}.`,
           date: weekend_date,
           excludedUserId: user.id
         })
@@ -116,7 +132,7 @@ export async function toggleActivityParticipation(activityId: string, isJoining:
     revalidatePath('/')
     return { success: true }
   } catch (e) {
-    console.error('Error toggling participation:', e)
+    console.error('Error updating participation:', e)
     return { success: false, error: 'No s\'ha pogut actualitzar la participació' }
   }
 }

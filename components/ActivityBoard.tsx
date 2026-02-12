@@ -13,6 +13,7 @@ export default async function ActivityBoard({ weekendDate, currentUserId }: { we
       *,
       activity_participants (
         user_id,
+        additional_participants,
         profiles (
           full_name,
           avatar_url,
@@ -35,10 +36,10 @@ export default async function ActivityBoard({ weekendDate, currentUserId }: { we
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
         {sortedActivities?.map((activity) => (
-          <ActivityCard 
-            key={activity.id} 
-            activity={activity} 
-            currentUserId={currentUserId} 
+          <ActivityCard
+            key={activity.id}
+            activity={activity}
+            currentUserId={currentUserId}
           />
         ))}
       </div>

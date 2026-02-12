@@ -26,13 +26,6 @@ export type Activity = {
 export type ActivityParticipant = {
   activity_id: string
   user_id: string
+  additional_participants: number
   profiles: Profile
-}
-
-export type WeekendPlan = {
-  user_id: string
-  weekend_date: string
-  status: 'going' | 'not_going' | 'pending'
-  comment?: string | null
-  updated_at: string
 }
