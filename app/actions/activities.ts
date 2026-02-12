@@ -113,7 +113,7 @@ export async function updateActivity(
 
     console.log("Updating activity:", { id, userId: user.id });
 
-    const { error } = await supabase
+    const { data, error, status } = await supabase
       .from("activities")
       .update({
         title,
@@ -122,11 +122,19 @@ export async function updateActivity(
         description,
       })
       .eq("id", id)
-      .eq("creator_id", user.id);
+      .eq("creator_id", user.id)
+      .select();
 
     if (error) {
       console.error("Supabase update error:", error);
-      throw error;
+      return { success: false, error: error.message };
+    }
+
+    console.log("Supabase update response:", { status, data });
+
+    if (!data || data.length === 0) {
+      console.warn("No rows updated. Check if the activity ID and creator ID match.");
+      return { success: false, error: "No s'ha trobat el pla o no en ets el creador" };
     }
 
     revalidatePath("/");
