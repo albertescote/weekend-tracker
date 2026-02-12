@@ -38,14 +38,14 @@ export default function ActivityDetailsModal({
       <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/70 backdrop-blur-md overflow-y-auto">
         <div className="bg-white dark:bg-zinc-900 w-full max-w-md rounded-[2.5rem] shadow-2xl overflow-hidden border border-zinc-100 dark:border-zinc-800 animate-in zoom-in-95 duration-200 my-auto flex flex-col">
           {/* Header */}
-          <div className="relative h-32 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+          <div className="relative py-10 bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
             <button
               onClick={onClose}
               className="absolute top-4 right-4 p-2 bg-white/20 hover:bg-white/40 backdrop-blur-md text-zinc-900 dark:text-white rounded-full transition-colors z-10"
             >
               <X size={20} />
             </button>
-            <div className="text-center space-y-3">
+            <div className="text-center space-y-4">
               <span className="bg-blue-500 text-white text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-widest">
                 {dayLabels[activity.day_of_week]}
               </span>
