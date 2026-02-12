@@ -111,22 +111,7 @@ export async function updateActivity(
     const { id, title, start_time, day_of_week, description } =
       validatedData.data;
 
-    console.log("Diagnostic: Checking activity before update:", { id, attemptingUserId: user.id });
-    const { data: currentActivity, error: fetchError } = await supabase
-      .from("activities")
-      .select("id, creator_id")
-      .eq("id", id)
-      .single();
-    
-    if (fetchError) {
-      console.error("Diagnostic: Fetch error:", fetchError);
-    } else {
-      console.log("Diagnostic: Current activity in DB:", currentActivity);
-    }
-
-    console.log("Updating activity:", { id, userId: user.id });
-
-    const { data, error, status } = await supabase
+    const { error } = await supabase
       .from("activities")
       .update({
         title,
@@ -135,20 +120,9 @@ export async function updateActivity(
         description,
       })
       .eq("id", id)
-      .eq("creator_id", user.id)
-      .select();
+      .eq("creator_id", user.id);
 
-    if (error) {
-      console.error("Supabase update error:", error);
-      return { success: false, error: error.message };
-    }
-
-    console.log("Supabase update response:", { status, data });
-
-    if (!data || data.length === 0) {
-      console.warn("No rows updated. Check if the activity ID and creator ID match.");
-      return { success: false, error: "No s'ha trobat el pla o no en ets el creador" };
-    }
+    if (error) throw error;
 
     revalidatePath("/");
     return { success: true };

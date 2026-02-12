@@ -39,8 +39,11 @@ export default function ActivityDetailsModal({
     title: activity.title,
     description: activity.description || "",
     day_of_week: activity.day_of_week,
-    start_time: activity.start_time || "",
+    start_time: activity.start_time || "19:00",
   });
+
+  // Split start_time for the select inputs
+  const [hour, minute] = (editForm.start_time || "19:00").split(":");
 
   const dayLabels: { [key: string]: string } = {
     divendres: "Divendres",
@@ -53,7 +56,7 @@ export default function ActivityDetailsModal({
       title: activity.title,
       description: activity.description || "",
       day_of_week: activity.day_of_week,
-      start_time: activity.start_time || "",
+      start_time: activity.start_time || "19:00",
     });
     setIsEditing(true);
   };
@@ -188,15 +191,41 @@ export default function ActivityDetailsModal({
                   />
                   <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800/50 px-4 py-2 rounded-2xl border border-blue-500">
                     <Clock size={16} className="text-zinc-400" />
-                    <input
-                      type="text"
-                      value={editForm.start_time}
-                      onChange={(e) =>
-                        setEditForm({ ...editForm, start_time: e.target.value })
-                      }
-                      placeholder="Ex: 21:00"
-                      className="bg-transparent text-xs font-black text-zinc-950 dark:text-white uppercase tracking-wider outline-none w-full"
-                    />
+                    <div className="flex items-center gap-2 w-full">
+                      <select
+                        value={hour}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            start_time: `${e.target.value}:${minute}`,
+                          })
+                        }
+                        className="bg-transparent text-xs font-black text-zinc-950 dark:text-white uppercase tracking-wider outline-none flex-1 appearance-none text-center"
+                      >
+                        {Array.from({ length: 24 }).map((_, i) => (
+                          <option key={i} value={i.toString().padStart(2, "0")}>
+                            {i.toString().padStart(2, "0")}h
+                          </option>
+                        ))}
+                      </select>
+                      <span className="font-bold text-zinc-400">:</span>
+                      <select
+                        value={minute}
+                        onChange={(e) =>
+                          setEditForm({
+                            ...editForm,
+                            start_time: `${hour}:${e.target.value}`,
+                          })
+                        }
+                        className="bg-transparent text-xs font-black text-zinc-950 dark:text-white uppercase tracking-wider outline-none flex-1 appearance-none text-center"
+                      >
+                        {["00", "15", "30", "45"].map((m) => (
+                          <option key={m} value={m}>
+                            {m}m
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
                 </div>
               ) : (
