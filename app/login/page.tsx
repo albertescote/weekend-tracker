@@ -1,36 +1,38 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const supabase = createClient()
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const supabase = createClient();
 
   const handleGoogleLogin = async () => {
-    setLoading(true)
-    setError('')
+    setLoading(true);
+    setError("");
 
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider: "google",
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
-    })
+    });
 
     if (error) {
-      setError(error.message)
-      setLoading(false)
+      setError(error.message);
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-background text-foreground">
       <div className="w-full max-w-sm space-y-8 bg-white dark:bg-zinc-900 p-8 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800 text-center">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">KONNECTA</h1>
-          <p className="text-zinc-500">Inicia sessió per organitzar el cap de setmana amb els teus amics</p>
+          <p className="text-zinc-500">
+            Inicia sessió per organitzar el cap de setmana amb els teus amics
+          </p>
         </div>
 
         <div className="py-4">
@@ -61,7 +63,7 @@ export default function LoginPage() {
                 />
               </svg>
             )}
-            {loading ? 'Connectant...' : 'Continua amb Google'}
+            {loading ? "Connectant..." : "Continua amb Google"}
           </button>
         </div>
 
@@ -72,9 +74,10 @@ export default function LoginPage() {
         )}
 
         <p className="text-xs text-zinc-400 px-4">
-          En iniciar sessió, acceptes compartir els teus plans amb els teus amics.
+          En iniciar sessió, acceptes compartir els teus plans amb els teus
+          amics.
         </p>
       </div>
     </div>
-  )
+  );
 }

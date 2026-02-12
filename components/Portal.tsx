@@ -1,15 +1,16 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function Portal({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-    return () => setMounted(false)
-  }, [])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
-  return mounted ? createPortal(children, document.body) : null
+  return mounted ? createPortal(children, document.body) : null;
 }

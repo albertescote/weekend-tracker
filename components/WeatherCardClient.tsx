@@ -1,31 +1,35 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { Thermometer } from 'lucide-react'
-import { getWeatherIcon, getWeatherDescription } from '@/lib/utils'
-import WeatherModal from './WeatherModal'
+import { useState } from "react";
+import { Thermometer } from "lucide-react";
+import { getWeatherIcon, getWeatherDescription } from "@/lib/utils";
+import WeatherModal from "./WeatherModal";
 
 interface WeatherDay {
-  date: string
-  maxTemp: number
-  minTemp: number
-  code: number
+  date: string;
+  maxTemp: number;
+  minTemp: number;
+  code: number;
 }
 
 interface WeatherData {
-  summary: WeatherDay | null | undefined
-  details: (WeatherDay | null)[]
+  summary: WeatherDay | null | undefined;
+  details: (WeatherDay | null)[];
 }
 
-export default function WeatherCardClient({ weatherData }: { weatherData: WeatherData }) {
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const weather = weatherData.summary
+export default function WeatherCardClient({
+  weatherData,
+}: {
+  weatherData: WeatherData;
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const weather = weatherData.summary;
 
-  if (!weather) return null
+  if (!weather) return null;
 
   return (
     <>
-      <button 
+      <button
         onClick={() => setIsModalOpen(true)}
         className="w-full text-left bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-5 rounded-[2rem] shadow-sm flex items-center justify-between hover:scale-[1.02] active:scale-[0.98] transition-all group"
       >
@@ -34,7 +38,9 @@ export default function WeatherCardClient({ weatherData }: { weatherData: Weathe
             {getWeatherIcon(weather.code)}
           </div>
           <div>
-            <p className="text-[10px] font-black uppercase text-blue-500 tracking-widest">El temps del cap de setmana</p>
+            <p className="text-[10px] font-black uppercase text-blue-500 tracking-widest">
+              El temps del cap de setmana
+            </p>
             <p className="text-xl font-black text-zinc-950 dark:text-white leading-tight">
               {getWeatherDescription(weather.code)}
             </p>
@@ -52,11 +58,11 @@ export default function WeatherCardClient({ weatherData }: { weatherData: Weathe
       </button>
 
       {isModalOpen && (
-        <WeatherModal 
-          forecast={weatherData.details} 
-          onClose={() => setIsModalOpen(false)} 
+        <WeatherModal
+          forecast={weatherData.details}
+          onClose={() => setIsModalOpen(false)}
         />
       )}
     </>
-  )
+  );
 }

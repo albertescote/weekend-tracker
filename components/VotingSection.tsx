@@ -1,73 +1,89 @@
-'use client'
+"use client";
 
-import { useOptimistic, useTransition, useState, useEffect } from 'react'
-import { updateStatus, updateComment } from '@/app/actions/plans'
-import { Check, X, Minus, MessageSquareText, SendHorizontal } from 'lucide-react'
+import { useOptimistic, useTransition, useState, useEffect } from "react";
+import { updateStatus, updateComment } from "@/app/actions/plans";
+import {
+  Check,
+  X,
+  Minus,
+  MessageSquareText,
+  SendHorizontal,
+} from "lucide-react";
 
-type Status = 'going' | 'not_going' | 'pending' | null
+type Status = "going" | "not_going" | "pending" | null;
 
 interface Props {
-  userId: string
-  weekendDate: string
-  initialStatus: Status
-  initialComment?: string | null
-  displayDate: string
+  userId: string;
+  weekendDate: string;
+  initialStatus: Status;
+  initialComment?: string | null;
+  displayDate: string;
 }
 
-export default function VotingSection({ userId, weekendDate, initialStatus, initialComment, displayDate }: Props) {
-  const [isPending, startTransition] = useTransition()
-  const [comment, setComment] = useState(initialComment || '')
-  const [showComment, setShowComment] = useState(!!initialComment)
+export default function VotingSection({
+  userId,
+  weekendDate,
+  initialStatus,
+  initialComment,
+  displayDate,
+}: Props) {
+  const [isPending, startTransition] = useTransition();
+  const [comment, setComment] = useState(initialComment || "");
+  const [showComment, setShowComment] = useState(!!initialComment);
   const [optimisticStatus, setOptimisticStatus] = useOptimistic(
     initialStatus,
-    (_, newStatus: Status) => newStatus
-  )
+    (_, newStatus: Status) => newStatus,
+  );
 
-  const hasCommentChanged = comment !== (initialComment || '')
+  const hasCommentChanged = comment !== (initialComment || "");
 
   useEffect(() => {
-    setComment(initialComment || '')
-    setShowComment(!!initialComment)
-  }, [initialComment, weekendDate])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setComment(initialComment || "");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShowComment(!!initialComment);
+  }, [initialComment, weekendDate]);
 
-  async function handleVote(status: 'going' | 'not_going' | 'pending') {
+  async function handleVote(status: "going" | "not_going" | "pending") {
     startTransition(async () => {
-      setOptimisticStatus(status)
+      setOptimisticStatus(status);
       try {
-        await updateStatus(userId, weekendDate, status, comment)
+        await updateStatus(userId, weekendDate, status, comment);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
-    })
+    });
   }
 
   async function handleSaveComment() {
     startTransition(async () => {
       try {
-        await updateComment(userId, weekendDate, comment)
+        await updateComment(userId, weekendDate, comment);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
-    })
+    });
   }
 
   return (
     <div className="flex flex-col items-center gap-4 p-5 bg-white dark:bg-zinc-900 rounded-3xl shadow-xl border border-zinc-200 dark:border-zinc-800">
       <div className="text-center space-y-0.5">
-        <h2 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">Hi seràs?</h2>
+        <h2 className="text-lg font-bold tracking-tight text-zinc-950 dark:text-white">
+          Hi seràs?
+        </h2>
         <p className="text-[9px] font-black uppercase tracking-widest text-blue-500 dark:text-blue-400">
           Cap de setmana del {displayDate}
         </p>
       </div>
-      
+
       <div className="flex gap-4">
         <button
-          onClick={() => handleVote('going')}
+          onClick={() => handleVote("going")}
           disabled={isPending}
           className={`px-4 py-3 rounded-2xl transition-all ${
-            optimisticStatus === 'going'
-              ? 'bg-green-500 text-white shadow-lg scale-110'
-              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+            optimisticStatus === "going"
+              ? "bg-green-500 text-white shadow-lg scale-110"
+              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"
           }`}
         >
           <Check size={32} />
@@ -75,12 +91,12 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
         </button>
 
         <button
-          onClick={() => handleVote('not_going')}
+          onClick={() => handleVote("not_going")}
           disabled={isPending}
           className={`px-4 py-3 rounded-2xl transition-all ${
-            optimisticStatus === 'not_going'
-              ? 'bg-red-500 text-white shadow-lg scale-110'
-              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+            optimisticStatus === "not_going"
+              ? "bg-red-500 text-white shadow-lg scale-110"
+              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"
           }`}
         >
           <X size={32} />
@@ -88,16 +104,18 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
         </button>
 
         <button
-          onClick={() => handleVote('pending')}
+          onClick={() => handleVote("pending")}
           disabled={isPending}
           className={`px-4 py-3 rounded-2xl transition-all ${
-            optimisticStatus === 'pending'
-              ? 'bg-zinc-400 text-white shadow-lg scale-110'
-              : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+            optimisticStatus === "pending"
+              ? "bg-zinc-400 text-white shadow-lg scale-110"
+              : "bg-zinc-100 dark:bg-zinc-800 text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700"
           }`}
         >
           <Minus size={32} />
-          <span className="block text-xs mt-1 font-medium text-center">Potser</span>
+          <span className="block text-xs mt-1 font-medium text-center">
+            Potser
+          </span>
         </button>
       </div>
 
@@ -140,5 +158,5 @@ export default function VotingSection({ userId, weekendDate, initialStatus, init
         )}
       </div>
     </div>
-  )
+  );
 }

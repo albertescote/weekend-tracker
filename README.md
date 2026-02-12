@@ -36,7 +36,7 @@ KONNECTA is a modern Progressive Web App (PWA) designed for groups of friends to
 
 ### Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - A Supabase project
 - A OneSignal app (for notifications)
 
@@ -73,6 +73,7 @@ CRON_SECRET=your_cron_job_secret
 ### Database Schema
 
 The project expects the following tables in Supabase:
+
 - `profiles`: User profiles linked to `auth.users`.
 - `weekend_plans`: Stores user status (`going`, `not_going`, `pending`) for specific dates.
 - `activities`: Specific events created within a weekend.

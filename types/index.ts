@@ -1,31 +1,31 @@
 export type ActionResponse = {
-  success: boolean
-  error?: string
-}
+  success: boolean;
+  error?: string;
+};
 
 export type Profile = {
-  id: string
-  full_name: string | null
-  avatar_url: string | null
-  email: string
-  updated_at: string
-}
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  email: string;
+  updated_at: string;
+};
 
 export type Activity = {
-  id: string
-  created_at: string
-  title: string
-  description: string | null
-  weekend_date: string
-  day_of_week: 'divendres' | 'dissabte' | 'diumenge'
-  start_time: string | null
-  creator_id: string
-  activity_participants?: ActivityParticipant[]
-}
+  id: string;
+  created_at: string;
+  title: string;
+  description: string | null;
+  weekend_date: string;
+  day_of_week: "divendres" | "dissabte" | "diumenge";
+  start_time: string | null;
+  creator_id: string;
+  activity_participants?: ActivityParticipant[];
+};
 
 export type ActivityParticipant = {
-  activity_id: string
-  user_id: string
-  additional_participants: number
-  profiles: Profile
-}
+  activity_id: string;
+  user_id: string;
+  additional_participants: number;
+  profiles: Profile;
+};

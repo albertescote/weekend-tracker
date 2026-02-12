@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import { signOut } from '@/app/actions/auth'
-import { Lock, LogOut } from 'lucide-react'
+import { signOut } from "@/app/actions/auth";
+import { Lock, LogOut } from "lucide-react";
 
 export default function NotAuthorized({ email }: { email: string }) {
   return (
@@ -11,13 +11,17 @@ export default function NotAuthorized({ email }: { email: string }) {
           <div className="w-20 h-20 bg-red-50 dark:bg-red-900/20 rounded-[2.5rem] flex items-center justify-center text-red-500 shadow-inner">
             <Lock size={40} />
           </div>
-          
+
           <div className="space-y-2">
             <h1 className="text-3xl font-black tracking-tighter text-zinc-950 dark:text-white">
               ACCÉS RESTRINGIT
             </h1>
             <p className="text-zinc-500 dark:text-zinc-400 font-medium">
-              Ho sentim, el correu <span className="text-zinc-950 dark:text-white font-bold">{email}</span> no és a la llista de convidats.
+              Ho sentim, el correu{" "}
+              <span className="text-zinc-950 dark:text-white font-bold">
+                {email}
+              </span>{" "}
+              no és a la llista de convidats.
             </p>
           </div>
         </div>
@@ -30,12 +34,12 @@ export default function NotAuthorized({ email }: { email: string }) {
             <LogOut size={20} />
             TANCAR SESSIÓ
           </button>
-          
+
           <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-            Contacta amb l'administrador per demanar accés.
+            Contacta amb l&apos;administrador per demanar accés.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }
