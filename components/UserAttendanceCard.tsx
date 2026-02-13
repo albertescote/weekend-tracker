@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useCallback, useRef, useState } from "react";
 import { Profile } from "@/types";
 import UserSummaryModal from "./UserSummaryModal";
 import Portal from "./Portal";
@@ -20,7 +20,7 @@ export default function UserAttendanceCard({ profile, comment }: Props) {
   const startLongPress = useCallback(() => {
     isLongPress.current = false;
     if (!comment) return;
-    
+
     longPressTimer.current = setTimeout(() => {
       isLongPress.current = true;
       setShowCommentPopup(true);
@@ -88,30 +88,27 @@ export default function UserAttendanceCard({ profile, comment }: Props) {
 
       {showCommentPopup && comment && (
         <Portal>
-          <div 
+          <div
             className="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
             onClick={() => setShowCommentPopup(false)}
           >
-            <div 
+            <div
               className="bg-white dark:bg-zinc-900 w-full max-w-xs rounded-3xl p-6 shadow-2xl border border-zinc-100 dark:border-zinc-800 animate-in zoom-in-95 duration-200 relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <button 
+              <button
                 onClick={() => setShowCommentPopup(false)}
                 className="absolute top-4 right-4 p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 transition-colors"
               >
                 <X size={18} />
               </button>
-              
+
               <div className="flex flex-col items-center text-center gap-4">
                 <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center text-blue-500">
                   <Quote size={24} fill="currentColor" />
                 </div>
-                
+
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
-                    Comentari de {profile.full_name?.split(' ')[0] || profile.email.split('@')[0]}
-                  </p>
                   <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200 leading-relaxed italic">
                     &quot;{comment}&quot;
                   </p>
