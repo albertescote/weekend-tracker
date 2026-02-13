@@ -31,7 +31,7 @@ export function generateGoogleCalendarUrl(activity: Activity) {
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
-    text: activity.title,
+    text: activity.title + " [Komando]",
     details: activity.description || "",
     location: "Valls",
     dates: dates, // Local time
