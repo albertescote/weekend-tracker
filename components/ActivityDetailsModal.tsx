@@ -1,11 +1,12 @@
 "use client";
 
-import { Clock, UserPlus, Users, X, Edit2, Check, Trash2 } from "lucide-react";
+import { Check, Clock, Edit2, Trash2, UserPlus, Users, X } from "lucide-react";
 import Portal from "./Portal";
+import AddToCalendarButton from "./AddToCalendarButton";
 import { Activity, ActivityParticipant } from "@/types";
 import { useState, useTransition } from "react";
-import { updateActivity, deleteActivity } from "@/app/actions/activities";
-import { addDays, parseISO, format } from "date-fns";
+import { deleteActivity, updateActivity } from "@/app/actions/activities";
+import { addDays, format, parseISO } from "date-fns";
 
 interface Props {
   activity: Activity;
@@ -265,10 +266,15 @@ export default function ActivityDetailsModal({
                       </span>
                     </div>
                   </div>
+
+                  {!isEditing && (
+                    <div className="flex justify-center pt-2">
+                      <AddToCalendarButton activity={activity} />
+                    </div>
+                  )}
                 </>
               )}
             </div>
-
             {/* Participants List */}
             {!isEditing && (
               <div className="space-y-4">

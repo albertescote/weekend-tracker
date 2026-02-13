@@ -1,13 +1,12 @@
 "use client";
 
-import { useOptimistic, useTransition, useState } from "react";
-import {
-  updateActivityParticipation,
-} from "@/app/actions/activities";
-import { Users, Clock, UserPlus } from "lucide-react";
+import { useOptimistic, useState, useTransition } from "react";
+import { updateActivityParticipation } from "@/app/actions/activities";
+import { Clock, UserPlus, Users } from "lucide-react";
 import { Activity } from "@/types";
 import ActivityDetailsModal from "./ActivityDetailsModal";
-import { addDays, parseISO, format } from "date-fns";
+import AddToCalendarButton from "./AddToCalendarButton";
+import { addDays, format, parseISO } from "date-fns";
 
 export default function ActivityCard({
   activity,
@@ -122,6 +121,9 @@ export default function ActivityCard({
                 {activity.description}
               </p>
             )}
+            <div className="pt-2">
+              <AddToCalendarButton activity={activity} />
+            </div>
           </div>
         </div>
 
