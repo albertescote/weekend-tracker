@@ -58,7 +58,7 @@ export function generateIcsFile(activity: Activity) {
     `DTSTAMP:${formatIcsDate(new Date())}`,
     `DTSTART:${formatIcsDate(startDate)}`,
     `DTEND:${formatIcsDate(endDate)}`,
-    `SUMMARY:${title}`,
+    `SUMMARY:${title} [Komando]`,
     `DESCRIPTION:${description}`,
     "LOCATION:Valls",
     "END:VEVENT",
