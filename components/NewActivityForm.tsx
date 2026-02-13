@@ -14,6 +14,8 @@ export default function NewActivityForm({
   const [selectedDay, setSelectedDay] = useState("dissabte");
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   const anchorDate = parseISO(weekendDate);
   const daysData = [
@@ -102,12 +104,22 @@ export default function NewActivityForm({
           ))}
         </div>
 
-        <input
-          name="title"
-          placeholder="Títol"
-          required
-          className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold"
-        />
+        <div className="space-y-1">
+          <input
+            name="title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Títol"
+            required
+            maxLength={50}
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-bold"
+          />
+          <div className="flex justify-end px-1">
+            <span className={`text-[8px] font-black ${title.length >= 45 ? 'text-red-500' : 'text-zinc-400'}`}>
+              {title.length}/50
+            </span>
+          </div>
+        </div>
 
         {/* Selector d'hora personalitzat de 15 minuts */}
         <div className="space-y-1.5">
@@ -143,12 +155,22 @@ export default function NewActivityForm({
           <input type="hidden" name="start_time" value="" />
         </div>
 
-        <textarea
-          name="description"
-          placeholder="Detalls (opcional)"
-          rows={2}
-          className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-medium"
-        />
+        <div className="space-y-1">
+          <textarea
+            name="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Detalls (opcional)"
+            rows={2}
+            maxLength={200}
+            className="w-full px-4 py-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border-none outline-none focus:ring-2 focus:ring-zinc-900 dark:focus:ring-zinc-100 font-medium"
+          />
+          <div className="flex justify-end px-1">
+            <span className={`text-[8px] font-black ${description.length >= 180 ? 'text-red-500' : 'text-zinc-400'}`}>
+              {description.length}/200
+            </span>
+          </div>
+        </div>
       </div>
 
       <button

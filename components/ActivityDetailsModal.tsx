@@ -168,9 +168,15 @@ export default function ActivityDetailsModal({
                       setEditForm({ ...editForm, title: e.target.value })
                     }
                     placeholder="Títol del pla"
+                    maxLength={50}
                     className="text-2xl font-black text-zinc-950 dark:text-white bg-transparent border-b-2 border-blue-500 outline-none text-center w-full"
                     autoFocus
                   />
+                  <div className="flex justify-center w-full">
+                    <span className={`text-[10px] font-black ${editForm.title.length >= 45 ? 'text-red-500' : 'text-zinc-400'}`}>
+                      {editForm.title.length}/50
+                    </span>
+                  </div>
                 </div>
               ) : (
                 <>
@@ -190,14 +196,22 @@ export default function ActivityDetailsModal({
             <div className="space-y-4">
               {isEditing ? (
                 <div className="space-y-4">
-                  <textarea
-                    value={editForm.description}
-                    onChange={(e) =>
-                      setEditForm({ ...editForm, description: e.target.value })
-                    }
-                    placeholder="Descripció (opcional)"
-                    className="w-full bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-blue-500 outline-none text-zinc-600 dark:text-zinc-400 font-medium resize-none min-h-[100px]"
-                  />
+                  <div className="space-y-1">
+                    <textarea
+                      value={editForm.description}
+                      onChange={(e) =>
+                        setEditForm({ ...editForm, description: e.target.value })
+                      }
+                      placeholder="Descripció (opcional)"
+                      maxLength={200}
+                      className="w-full bg-zinc-50 dark:bg-zinc-800/50 p-4 rounded-2xl border border-blue-500 outline-none text-zinc-600 dark:text-zinc-400 font-medium resize-none min-h-[100px]"
+                    />
+                    <div className="flex justify-end px-1">
+                      <span className={`text-[10px] font-black ${editForm.description.length >= 180 ? 'text-red-500' : 'text-zinc-400'}`}>
+                        {editForm.description.length}/200
+                      </span>
+                    </div>
+                  </div>
                   <div className="flex items-center gap-3 bg-zinc-50 dark:bg-zinc-800/50 px-4 py-2 rounded-2xl border border-blue-500">
                     <Clock size={16} className="text-zinc-400" />
                     <div className="flex items-center gap-2 w-full">

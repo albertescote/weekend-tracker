@@ -135,18 +135,23 @@ export default function VotingSection({
                 onChange={(e) => setComment(e.target.value)}
                 placeholder="Ex: Tinc un sopar dissabte..."
                 className="w-full p-3 pr-12 text-sm bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-100 dark:border-zinc-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 resize-none min-h-[60px] transition-all"
-                maxLength={280}
+                maxLength={140}
               />
-              {hasCommentChanged && (
-                <button
-                  onClick={handleSaveComment}
-                  disabled={isPending}
-                  className="absolute right-2 p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50"
-                  title="Guardar comentari"
-                >
-                  <SendHorizontal size={16} />
-                </button>
-              )}
+              <div className="absolute bottom-2 right-2 flex flex-col items-end gap-1">
+                <span className={`text-[8px] font-black ${comment.length >= 130 ? 'text-red-500' : 'text-zinc-400'}`}>
+                  {comment.length}/140
+                </span>
+                {hasCommentChanged && (
+                  <button
+                    onClick={handleSaveComment}
+                    disabled={isPending}
+                    className="p-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition-colors disabled:opacity-50"
+                    title="Guardar comentari"
+                  >
+                    <SendHorizontal size={16} />
+                  </button>
+                )}
+              </div>
             </div>
             {hasCommentChanged && (
               <p className="text-[9px] text-blue-500 font-bold text-center uppercase tracking-wider animate-pulse">
