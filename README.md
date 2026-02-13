@@ -16,6 +16,7 @@ KONNECTA is a modern Progressive Web App (PWA) designed for groups of friends to
 - **Authentication:** Secure login via Google OAuth and Magic Links using Supabase Auth.
 - **Weekend Voting:** Users can mark themselves as "Going", "Not Going", or "Pending" for any upcoming weekend.
 - **Activity Board:** Create and join specific plans (e.g., "Dinner on Saturday", "Padel match") associated with a weekend.
+- **Add to Calendar:** Save activities directly to Google Calendar or download an `.ics` file for iOS/Outlook.
 - **Contextual Weather:** Real-time weather forecasts for the selected weekend to help plan activities.
 - **Hall of Fame:** Gamified leaderboards to track who visits most frequently.
 - **Push Notifications:** Stay updated when friends change their status or new plans are created.
